@@ -26,10 +26,14 @@ def create_hist(values, combinaison="Inox-Alu", bins=200):
 
 
 #Start data analysis
-inox_alu = get_values_from_file("lab1/lab1_InoxAlu_1010_09_19_2023.lvm")
-print(inox_alu)
-create_hist(inox_alu)
+val = get_values_from_file("lab1/lab1_InoxAlu_1010_09_19_2023.lvm")
+create_hist(val, "Inox-Alu -10 10")
 
-inox_alu = get_values_from_file("lab1/lab1_InoxZinc_19_09_2023.lvm")
-print(inox_alu)
-create_hist(inox_alu)
+val = get_values_from_file("lab1/lab1_InoxAlu_19_09_2023.lvm")
+create_hist(val, "Inox-Alu", bins=1000)
+
+val = get_values_from_file("lab1/lab1_InoxZinc_19_09_2023.lvm")
+create_hist(val, "Inox-Zinc", bins=1000)
+
+val = get_values_from_file("lab1/lab1_AcierAlu_19_09_2023.lvm")
+create_hist(val, "Acier-Alu")
