@@ -50,7 +50,8 @@ def create_scatter(values, combinaison="Inox-Alu", bins=200):
 #HISTOGRAMS ONLY:   1
 #SCATTER PLOTS:     2
 #BOTH PLOTS:        3
-choice = int(input("Choice? [0,1,2,3]"))
+#NEW CALCULS        4
+choice = int(input("Choice? [0,1,2,3,4]"))
 
 #Start data analysis
 val = get_values_from_file("lab1/lab1_InoxAlu_1010_09_19_2023.lvm")
@@ -82,3 +83,51 @@ if choice in (1,3):
     create_hist(val, "Zinc-Alu -1V à 1V", bins=1000)
 if choice in (2,3):
     create_scatter(val, "Zinc-Alu -1V à 1V", bins=1000)
+
+from statistics import *
+if choice == 4:
+
+    val_10 = get_values_from_file("lab1/lab1_InoxAlu_1010_09_19_2023.lvm")
+    val_1 = get_values_from_file("lab1/lab1_InoxAlu_19_09_2023.lvm")
+
+    sorted_10, sorted_1 = sorted(np.array(val_10)), sorted(np.array(val_1))
+
+    create_scatter(val_1, "Inox-Alu -1V à 1V", bins=1000)
+
+    #plt.plot(sorted_10)
+    #plt.show()
+
+if choice == 5:
+    tension = np.array(pd.read_csv("lab1/lab1_breadboard_19_09_2023.lvm", delimiter="\t", decimal=",", skipinitialspace=True, skiprows=22, usecols=["Tension"])) #, usecols=["Tension","Tension_0"]
+    tension_0 = np.array(pd.read_csv("lab1/lab1_breadboard_19_09_2023.lvm", delimiter="\t", decimal=",", skipinitialspace=True, skiprows=22, usecols=["Tension_0"]))
+    courant = tension_0/12 #tension/12ohm = courant
+    resistance = tension/courant
+    new_resistance = []
+    for i in resistance:
+        if i>50000:
+            new_resistance.append(i)
+
+    print("moyenne:", np.mean(new_resistance))
+    print("médianne:", np.median(new_resistance))
+    print("déviation:", np.std(new_resistance))
+    print("3 sigma:", 3*np.std(new_resistance))
+    print(len(new_resistance))
+    print(np.quantile(new_resistance, 0.16), np.quantile(new_resistance, 0.84))
+
+    ax1 = plt.subplot(111)
+    ticklabels = ax1.get_xticklabels()
+    ticklabels.extend( ax1.get_yticklabels() )
+    for label in ticklabels:
+        label.set_fontsize(10)
+    plt.plot(new_resistance, "o", color='blue')
+    plt.axhline(y = np.mean(new_resistance), color = 'green', linestyle = '--', label='Moyenne')
+    plt.axhline(y = np.median(new_resistance), color = 'red', linestyle = '--', label='Médiane')
+    plt.suptitle(f'Distribution de la mesure de la résistance', size=17)
+    plt.legend()
+    plt.ylabel(r'Résistance [$\Omega$]', size=17)
+    plt.xlabel(r'n$^\mathrm{ième}$ mesure', size=17)
+    plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab1'+f"\scatter_resistance.pdf", format="pdf", bbox_inches="tight")
+    plt.show()
+
+    
+    #print(data)
