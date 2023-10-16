@@ -30,8 +30,14 @@ def create_multiple(x_values, y_values, title="Title"):
         label.set_fontsize(10)
     for i in range(len(x_values)):
         plt.plot(x_values[i], y_values[i], "-", label=f"Tension base: {str(i*0.2)[:3]} V")
-    plt.axvline(1)
-    plt.text(2, 0.45, r"$i_\mathrm{sat}=0.5$A", fontsize=16)
+        print(f"Tension base: {str(i*0.2)[:3]} V")
+        print(np.median(y_values[i][11:]))
+        sigma_lo = np.median(y_values[i][11:]) - np.quantile(y_values[i][11:], 0.16)
+        sigma_hi = np.quantile(y_values[i][11:], 0.84) - np.median(y_values[i][11:])
+        uncertainty = sigma_hi if sigma_hi>sigma_lo else sigma_lo
+        print("uncertainty:", uncertainty)
+    #plt.axvline(1)
+    #plt.text(2, 0.45, r"$i_\mathrm{sat}=0.5$A", fontsize=16)
     plt.legend()
     plt.suptitle(f'{title}', size=17)
     plt.ylabel(r'Intensité du courant [A]', size=17)
@@ -71,7 +77,7 @@ courant = []
 for i in range(6):
     tension.append(tensions[i*20:i*20+20])
     courant.append(courants[i*20:i*20+20])
-create_multiple(tension, courant, "Courbes $i-v$ du transitor")
+create_multiple(tension, courant, "Courbes $i-v$ du transistor")
 
 
 
