@@ -69,17 +69,14 @@ plt.show()
 x_sim = np.linspace(10,250, 100)
 
 
-#Model of P(R,V):
-
-def puissance(known_params, R_S):
-    return known_params[0]*np.abs(known_params[1])**2*(1/(known_params[0]+R_S)**2)
-
-def puissance(R_ch, R_S, X_ch):
-    return R_ch*np.abs(1/np.sqrt(2))**2*(1/((R_ch+R_S)**2+X_ch**2))
 
 #même fct sans fixer V_S à 1/sqrt(2)
-def puissance_tension_var(R_ch, V_S, R_S):
-    return R_ch*np.abs(V_S)**2*(1/(R_ch+R_S)**2)
+w = 1000*2*np.pi
+c = 4 #micro Farads
+def puissance_tension_var(R, R_S):
+    r_ch = (R/(1+(R*w*c)**2))
+    x_ch = (-R^2*w*c/(1+(R*w*c)**2))
+    return r_ch*np.abs(1/np.sqrt(2))**2*(1/((r_ch+R_S)**2+x_ch**2))
 
 #Fitting power:
 

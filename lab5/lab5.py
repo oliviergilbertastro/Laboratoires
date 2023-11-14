@@ -60,8 +60,8 @@ for i in range(14):
 
     resistance_sansC.append(np.median(res))
     tension_sansC.append(np.median(ten))
-    resistance_sansC_stdev.append(np.std(res))
-    tension_sansC_stdev.append(np.std(ten))
+    resistance_sansC_stdev.append(np.std(res)+0.00002*np.median(res)+0.000005*1000)
+    tension_sansC_stdev.append(5E-3)
 
 
 
@@ -84,6 +84,7 @@ plt.xscale('log')
 plt.ylabel(r'P$_\mathrm{moy}$ [W]', size=17)
 plt.xlabel(r'Résistance [$\Omega$]', size=17)
 plt.show()
+
 
 ax1 = plt.subplot(111)
 ticklabels = ax1.get_xticklabels()
