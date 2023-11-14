@@ -71,11 +71,11 @@ x_sim = np.linspace(10,250, 100)
 
 
 #même fct sans fixer V_S à 1/sqrt(2)
-w = 1000*2*np.pi
-c = 4 #micro Farads
+w = 1000*2*np.pi #2pi*1000Hz
+c = 4E-6 #Farads
 def puissance_tension_var(R, R_S):
     r_ch = (R/(1+(R*w*c)**2))
-    x_ch = (-R^2*w*c/(1+(R*w*c)**2))
+    x_ch = (-R**2*w*c/(1+(R*w*c)**2))
     return r_ch*np.abs(1/np.sqrt(2))**2*(1/((r_ch+R_S)**2+x_ch**2))
 
 #Fitting power:
@@ -100,12 +100,13 @@ monte_carlo_iterations = input("How many iterations? [1000]")
 if monte_carlo_iterations == "":
     monte_carlo_iterations = 1000
 for i in tqdm(range(int(monte_carlo_iterations))):
+
     res = curve_fit(puissance_tension_var, resample_array(resistance_avecC, resistance_avecC_stdev), resample_array(puissance_moy_avecC, puissance_moy_avecC_stdev))[0]
-    tension_efficace_fit.append(res[0])
-    resistance_fit.append(res[1])
+    #tension_efficace_fit.append(res[0])
+    resistance_fit.append(res[0])
 
 #Make histograms of fitted params
-ax1 = plt.subplot(121)
+ax1 = plt.subplot(111)
 counts, bins = np.histogram(resistance_fit, bins=200)
 ax1.stairs(counts, bins)
 ax1.set_ylabel(r'Counts', size=17)
@@ -117,27 +118,14 @@ plt.axvline(x = np.quantile(resistance_fit, 0.9775), color = 'green', linestyle 
 plt.axvline(x = np.quantile(resistance_fit, 0.0015), color = 'orange', linestyle = '-', label=r'3$\sigma$')
 plt.axvline(x = np.quantile(resistance_fit, 0.9985), color = 'orange', linestyle = '-')
 plt.legend()
-ax2 = plt.subplot(122)
-counts, bins = np.histogram(tension_efficace_fit, bins=200)
-ax2.stairs(counts, bins)
-ax2.set_ylabel(r'Counts', size=17)
-ax2.set_xlabel(r'Tension efficace [V]', size=17)
-plt.axvline(x = np.quantile(tension_efficace_fit, 0.1585), color = 'blue', linestyle = '-', label=r'1$\sigma$')
-plt.axvline(x = np.quantile(tension_efficace_fit, 0.8415), color = 'blue', linestyle = '-')
-plt.axvline(x = np.quantile(tension_efficace_fit, 0.0225), color = 'green', linestyle = '-', label=r'2$\sigma$')
-plt.axvline(x = np.quantile(tension_efficace_fit, 0.9775), color = 'green', linestyle = '-')
-plt.axvline(x = np.quantile(tension_efficace_fit, 0.0015), color = 'orange', linestyle = '-', label=r'3$\sigma$')
-plt.axvline(x = np.quantile(tension_efficace_fit, 0.9985), color = 'orange', linestyle = '-')
-plt.legend()
 plt.show()
 
 median_res = np.median(resistance_fit)
-median_ten = np.median(tension_efficace_fit)
-median_ten = 0.8
+
 
 found_sim = []
 for i in range(len(x_sim)):
-    found_sim.append(puissance_tension_var(x_sim[i], median_ten, median_res))
+    found_sim.append(puissance_tension_var(x_sim[i], median_res))
 
 #print(np.array(puissance_moy_sansC)/np.array(pow_2))
 
@@ -159,15 +147,6 @@ sigma_2 = ((np.quantile(resistance_fit, 0.9775)-np.quantile(resistance_fit, 0.50
 sigma_3 = ((np.quantile(resistance_fit, 0.9985)-np.quantile(resistance_fit, 0.50))+(np.quantile(resistance_fit, 0.5)-np.quantile(resistance_fit, 0.0015)))/2
 
 print(f"R_S:     {np.median(resistance_fit)}")
-print(f"        1 sigma: {sigma_1}")
-print(f"        2 sigma: {sigma_2}")
-print(f"        3 sigma: {sigma_3}")
-
-sigma_1 = ((np.quantile(tension_efficace_fit, 0.8415)-np.quantile(tension_efficace_fit, 0.50))+(np.quantile(tension_efficace_fit, 0.5)-np.quantile(tension_efficace_fit, 0.1585)))/2
-sigma_2 = ((np.quantile(tension_efficace_fit, 0.9775)-np.quantile(tension_efficace_fit, 0.50))+(np.quantile(tension_efficace_fit, 0.5)-np.quantile(tension_efficace_fit, 0.0225)))/2
-sigma_3 = ((np.quantile(tension_efficace_fit, 0.9985)-np.quantile(tension_efficace_fit, 0.50))+(np.quantile(tension_efficace_fit, 0.5)-np.quantile(tension_efficace_fit, 0.0015)))/2
-
-print(f"V_S:     {np.median(tension_efficace_fit)}")
 print(f"        1 sigma: {sigma_1}")
 print(f"        2 sigma: {sigma_2}")
 print(f"        3 sigma: {sigma_3}")
