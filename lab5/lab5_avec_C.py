@@ -73,10 +73,12 @@ x_sim = np.linspace(10,250, 100)
 #même fct sans fixer V_S à 1/sqrt(2)
 w = 1000*2*np.pi #2pi*1000Hz
 c = 4E-6 #Farads
+v_S = 1/np.sqrt(2)
+x_S = 0
 def puissance_tension_var(R, R_S):
     r_ch = (R/(1+(R*w*c)**2))
     x_ch = (-R**2*w*c/(1+(R*w*c)**2))
-    return r_ch*np.abs(1/np.sqrt(2))**2*(1/((r_ch+R_S)**2+x_ch**2))
+    return r_ch*v_S**2*(1/((r_ch+R_S)**2+(x_ch+x_S)**2))
 
 #Fitting power:
 
@@ -96,10 +98,15 @@ def resample_array(current, current_std):
 
 resistance_fit = []
 tension_efficace_fit = []
+x_s_fit = []
 monte_carlo_iterations = input("How many iterations? [1000]")
 if monte_carlo_iterations == "":
     monte_carlo_iterations = 1000
 for i in tqdm(range(int(monte_carlo_iterations))):
+
+    #Resample the capacity each iteration to account for its 20% uncertainty
+    #Using c=3.31E-6 gives a good fit
+    c = gauss(4E-6, (4E-6)*0.2)
 
     res = curve_fit(puissance_tension_var, resample_array(resistance_avecC, resistance_avecC_stdev), resample_array(puissance_moy_avecC, puissance_moy_avecC_stdev))[0]
     #tension_efficace_fit.append(res[0])
@@ -121,7 +128,6 @@ plt.legend()
 plt.show()
 
 median_res = np.median(resistance_fit)
-
 
 found_sim = []
 for i in range(len(x_sim)):
@@ -146,7 +152,7 @@ sigma_1 = ((np.quantile(resistance_fit, 0.8415)-np.quantile(resistance_fit, 0.50
 sigma_2 = ((np.quantile(resistance_fit, 0.9775)-np.quantile(resistance_fit, 0.50))+(np.quantile(resistance_fit, 0.5)-np.quantile(resistance_fit, 0.0225)))/2
 sigma_3 = ((np.quantile(resistance_fit, 0.9985)-np.quantile(resistance_fit, 0.50))+(np.quantile(resistance_fit, 0.5)-np.quantile(resistance_fit, 0.0015)))/2
 
-print(f"R_S:     {np.median(resistance_fit)}")
+print(f"R_S:     {median_res}")
 print(f"        1 sigma: {sigma_1}")
 print(f"        2 sigma: {sigma_2}")
 print(f"        3 sigma: {sigma_3}")
