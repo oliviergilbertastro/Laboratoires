@@ -150,16 +150,29 @@ plt.axvline(x = np.quantile(resistance_fit, 0.9775), color = 'green', linestyle 
 plt.axvline(x = np.quantile(resistance_fit, 0.0015), color = 'orange', linestyle = '-', label=r'3$\sigma$')
 plt.axvline(x = np.quantile(resistance_fit, 0.9985), color = 'orange', linestyle = '-')
 plt.legend()
-plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5'+f"\hist_sansC.pdf", format="pdf", bbox_inches="tight")
+#plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5'+f"\hist_sansC.pdf", format="pdf", bbox_inches="tight")
 plt.show()
 
-res = curve_fit(puissance, resistance_sansC, puissance_moy_sansC, sigma=puissance_moy_sansC_stdev)
-print(res)
+median_res = np.median(resistance_fit)
 
+
+#Get models for median, 1sigma+ and 1sigma- to eventually fillbetween uncertainties
 
 found_sim = []
+sim_hi1 = []
+sim_lo1 = []
+sim_hi2 = []
+sim_lo2 = []
+sim_hi3 = []
+sim_lo3 = []
 for i in range(len(x_sim)):
-    found_sim.append(puissance(x_sim[i], res[0][0]))
+    found_sim.append(puissance(x_sim[i], median_res))
+    sim_hi1.append(puissance(x_sim[i], np.quantile(resistance_fit, 0.8415)))
+    sim_lo1.append(puissance(x_sim[i], np.quantile(resistance_fit, 0.1585)))
+    sim_hi2.append(puissance(x_sim[i], np.quantile(resistance_fit, 0.9775)))
+    sim_lo2.append(puissance(x_sim[i], np.quantile(resistance_fit, 0.0225)))
+    sim_hi3.append(puissance(x_sim[i], np.quantile(resistance_fit, 0.9985)))
+    sim_lo3.append(puissance(x_sim[i], np.quantile(resistance_fit, 0.0015)))
 
 #print(np.array(puissance_moy_sansC)/np.array(pow_2))
 
@@ -169,12 +182,15 @@ ticklabels.extend( ax1.get_yticklabels() )
 for label in ticklabels:
     label.set_fontsize(14)
 plt.errorbar(resistance_sansC, puissance_moy_sansC, puissance_moy_sansC_stdev, resistance_sansC_stdev, ".", label="données")
-plt.plot(x_sim, found_sim, label="modèle ajusté")
+plt.plot(x_sim, found_sim, color="red", label="modèle ajusté")
+plt.fill_between(x_sim, sim_lo3, sim_hi1, color="orange", alpha=0.2)
+plt.fill_between(x_sim, sim_lo2, sim_hi1, color="orange", alpha=0.4)
+plt.fill_between(x_sim, sim_lo1, sim_hi1, color="orange", alpha=0.6)
 plt.legend()
 plt.xscale('log')
 plt.ylabel(r'P$_\mathrm{moy}$ [W]', size=17)
 plt.xlabel(r'Résistance [$\Omega$]', size=17)
-plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5\resistance_sansC.pdf', format="pdf", bbox_inches="tight")
+#plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5\resistance_sansC.pdf', format="pdf", bbox_inches="tight")
 plt.show()
 
 sigma_1 = ((np.quantile(resistance_fit, 0.8415)-np.quantile(resistance_fit, 0.50))+(np.quantile(resistance_fit, 0.5)-np.quantile(resistance_fit, 0.1585)))/2
