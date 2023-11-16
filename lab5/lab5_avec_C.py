@@ -27,8 +27,8 @@ for i in range(14):
 
     resistance_avecC.append(np.median(res))
     tension_avecC.append(np.median(ten))
-    resistance_avecC_stdev.append(np.std(res))
-    tension_avecC_stdev.append(np.std(ten))
+    resistance_avecC_stdev.append(np.std(res)+0.00002*np.median(res)+0.000005*1000)
+    tension_avecC_stdev.append(5E-3)
 
 
 
@@ -106,7 +106,7 @@ for i in tqdm(range(int(monte_carlo_iterations))):
 
     #Resample the capacity each iteration to account for its 20% uncertainty
     #Using c=3.31E-6 gives a good fit
-    c = gauss(4E-6, (4E-6)*0.2)
+    c = gauss(3.3E-6, (3.3E-6)*0.2)
 
     res = curve_fit(puissance_tension_var, resample_array(resistance_avecC, resistance_avecC_stdev), resample_array(puissance_moy_avecC, puissance_moy_avecC_stdev))[0]
     #tension_efficace_fit.append(res[0])
@@ -125,6 +125,7 @@ plt.axvline(x = np.quantile(resistance_fit, 0.9775), color = 'green', linestyle 
 plt.axvline(x = np.quantile(resistance_fit, 0.0015), color = 'orange', linestyle = '-', label=r'3$\sigma$')
 plt.axvline(x = np.quantile(resistance_fit, 0.9985), color = 'orange', linestyle = '-')
 plt.legend()
+plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5'+f"\hist_avecC.pdf", format="pdf", bbox_inches="tight")
 plt.show()
 
 median_res = np.median(resistance_fit)
@@ -140,12 +141,13 @@ ticklabels = ax1.get_xticklabels()
 ticklabels.extend( ax1.get_yticklabels() )
 for label in ticklabels:
     label.set_fontsize(14)
-plt.errorbar(resistance_avecC, puissance_moy_avecC, puissance_moy_avecC_stdev, resistance_avecC_stdev, ".", label="data")
-plt.plot(x_sim, found_sim, label="fit")
+plt.errorbar(resistance_avecC, puissance_moy_avecC, puissance_moy_avecC_stdev, resistance_avecC_stdev, ".", label="données")
+plt.plot(x_sim, found_sim, label="modèle ajusté")
 plt.legend()
 plt.xscale('log')
 plt.ylabel(r'P$_\mathrm{moy}$ [W]', size=17)
 plt.xlabel(r'Résistance [$\Omega$]', size=17)
+plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5\resistance_avecC.pdf', format="pdf", bbox_inches="tight")
 plt.show()
 
 sigma_1 = ((np.quantile(resistance_fit, 0.8415)-np.quantile(resistance_fit, 0.50))+(np.quantile(resistance_fit, 0.5)-np.quantile(resistance_fit, 0.1585)))/2
