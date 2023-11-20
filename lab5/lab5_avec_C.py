@@ -50,7 +50,7 @@ plt.errorbar(resistance_avecC, puissance_moy_avecC, puissance_moy_avecC_stdev, r
 plt.xscale('log')
 plt.ylabel(r'P$_\mathrm{moy}$ [W]', size=17)
 plt.xlabel(r'Résistance [$\Omega$]', size=17)
-plt.show()
+#plt.show()
 
 ax1 = plt.subplot(111)
 ticklabels = ax1.get_xticklabels()
@@ -61,7 +61,7 @@ plt.plot(resistance_avecC, tension_avecC, ".")
 plt.xscale('log')
 plt.ylabel(r'Tension [V]', size=17)
 plt.xlabel(r'Résistance [$\Omega$]', size=17)
-plt.show()
+#plt.show()
 
 
 
@@ -126,7 +126,9 @@ plt.axvline(x = np.quantile(resistance_fit, 0.0015), color = 'orange', linestyle
 plt.axvline(x = np.quantile(resistance_fit, 0.9985), color = 'orange', linestyle = '-')
 plt.legend()
 #plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5'+f"\hist_avecC.pdf", format="pdf", bbox_inches="tight")
-plt.show()
+#plt.show()
+
+plt.clf()
 
 median_res = np.median(resistance_fit)
 
@@ -156,14 +158,15 @@ for label in ticklabels:
     label.set_fontsize(14)
 plt.errorbar(resistance_avecC, puissance_moy_avecC, puissance_moy_avecC_stdev, resistance_avecC_stdev, ".", label="données")
 plt.plot(x_sim, found_sim, color="red", label="modèle ajusté")
-plt.fill_between(x_sim, sim_lo3, sim_hi1, color="orange", alpha=0.2)
-plt.fill_between(x_sim, sim_lo2, sim_hi1, color="orange", alpha=0.4)
+plt.fill_between(x_sim, sim_lo3, sim_hi3, color="orange", alpha=0.2)
+plt.fill_between(x_sim, sim_lo2, sim_hi2, color="orange", alpha=0.4)
 plt.fill_between(x_sim, sim_lo1, sim_hi1, color="orange", alpha=0.6)
+plt.fill_betweenx([0, 0.003], x_sim[sim_lo3.index(max(sim_lo3))], x_sim[sim_hi3.index(max(sim_hi3))], color="green", alpha=0.3, label="transfert de puissance maximal")
 plt.legend()
 plt.xscale('log')
 plt.ylabel(r'P$_\mathrm{moy}$ [W]', size=17)
 plt.xlabel(r'Résistance [$\Omega$]', size=17)
-#plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5\resistance_avecC.pdf', format="pdf", bbox_inches="tight")
+plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5\resistance_avecC.pdf', format="pdf", bbox_inches="tight")
 plt.show()
 
 sigma_1 = ((np.quantile(resistance_fit, 0.8415)-np.quantile(resistance_fit, 0.50))+(np.quantile(resistance_fit, 0.5)-np.quantile(resistance_fit, 0.1585)))/2
@@ -174,3 +177,8 @@ print(f"R_S:     {median_res}")
 print(f"        1 sigma: {sigma_1}")
 print(f"        2 sigma: {sigma_2}")
 print(f"        3 sigma: {sigma_3}")
+
+
+print(x_sim[found_sim.index(max(found_sim))])
+print(x_sim[sim_hi3.index(max(sim_hi3))])
+print(x_sim[sim_lo3.index(max(sim_lo3))])
