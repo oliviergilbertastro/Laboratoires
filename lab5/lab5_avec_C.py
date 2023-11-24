@@ -111,12 +111,12 @@ for i in tqdm(range(int(monte_carlo_iterations))):
     res = curve_fit(puissance_tension_var, resample_array(resistance_avecC, resistance_avecC_stdev), resample_array(puissance_moy_avecC, puissance_moy_avecC_stdev))[0]
     #tension_efficace_fit.append(res[0])
     resistance_fit.append(res[0])
-
+plt.clf()
 #Make histograms of fitted params
 ax1 = plt.subplot(111)
 counts, bins = np.histogram(resistance_fit, bins=200)
 ax1.stairs(counts, bins)
-ax1.set_ylabel(r'Counts', size=17)
+ax1.set_ylabel(r"Nombre d'instances", size=17)
 ax1.set_xlabel(r'Résistance [$\Omega$]', size=17)
 plt.axvline(x = np.quantile(resistance_fit, 0.1585), color = 'blue', linestyle = '-', label=r'1$\sigma$')
 plt.axvline(x = np.quantile(resistance_fit, 0.8415), color = 'blue', linestyle = '-')
@@ -125,14 +125,20 @@ plt.axvline(x = np.quantile(resistance_fit, 0.9775), color = 'green', linestyle 
 plt.axvline(x = np.quantile(resistance_fit, 0.0015), color = 'orange', linestyle = '-', label=r'3$\sigma$')
 plt.axvline(x = np.quantile(resistance_fit, 0.9985), color = 'orange', linestyle = '-')
 plt.legend()
-#plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5'+f"\hist_avecC.pdf", format="pdf", bbox_inches="tight")
-#plt.show()
+plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5'+f"\hist_avecC.pdf", format="pdf", bbox_inches="tight")
+plt.show()
 
 plt.clf()
 
+w = 1000*2*np.pi #2pi*1000Hz
+c = 4E-6 #Farads
+v_S = 1/np.sqrt(2)
+x_S = 0
 median_res = np.median(resistance_fit)
+median_res = curve_fit(puissance_tension_var, resistance_avecC, puissance_moy_avecC, p0=50)[0]
 
 found_sim = []
+empirique = []
 sim_hi1 = []
 sim_lo1 = []
 sim_hi2 = []
@@ -141,6 +147,7 @@ sim_hi3 = []
 sim_lo3 = []
 for i in range(len(x_sim)):
     found_sim.append(puissance_tension_var(x_sim[i], median_res))
+    empirique.append(puissance_tension_var(x_sim[i], 50))
     sim_hi1.append(puissance_tension_var(x_sim[i], np.quantile(resistance_fit, 0.8415)))
     sim_lo1.append(puissance_tension_var(x_sim[i], np.quantile(resistance_fit, 0.1585)))
     sim_hi2.append(puissance_tension_var(x_sim[i], np.quantile(resistance_fit, 0.9775)))
@@ -158,6 +165,7 @@ for label in ticklabels:
     label.set_fontsize(14)
 plt.errorbar(resistance_avecC, puissance_moy_avecC, puissance_moy_avecC_stdev, resistance_avecC_stdev, ".", label="données")
 plt.plot(x_sim, found_sim, color="red", label="modèle ajusté")
+plt.plot(x_sim, empirique, color="blue", label=r"modèle 50$\Omega$")
 plt.fill_between(x_sim, sim_lo3, sim_hi3, color="orange", alpha=0.2)
 plt.fill_between(x_sim, sim_lo2, sim_hi2, color="orange", alpha=0.4)
 plt.fill_between(x_sim, sim_lo1, sim_hi1, color="orange", alpha=0.6)

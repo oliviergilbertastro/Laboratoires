@@ -24,8 +24,8 @@ def create__osci_plot(filename, name):
     ticklabels.extend( ax1.get_yticklabels() )
     for label in ticklabels:
         label.set_fontsize(10)
-    plt.plot(x, y, label="Canal 1")
-    plt.plot(x, z, label="Canal 2")
+    plt.plot(x[:int(len(x)/3)], y[:int(len(x)/3)], label="Canal 1")
+    plt.plot(x[:int(len(x)/3)], z[:int(len(x)/3)], label="Canal 2")
     plt.legend()
     #plt.suptitle(f'Oscilloscope avec impulsion de durée {name}', size=17)
     plt.ylabel(r'Tension [V]', size=17)
@@ -37,10 +37,11 @@ def create__osci_plot(filename, name):
 
 
 
-#create__osci_plot("lab5/usb/scope_i5.csv", "5W")
-#create__osci_plot("lab5/usb/scope_i6.csv", "W")
-#create__osci_plot("lab5/usb/scope_i7.csv", "W (court-circuité)")
-#create__osci_plot("lab5/usb/scope_i8.csv", "5W (court-circuité)")
+create__osci_plot("lab5/usb/scope_i5.csv", "5W")
+create__osci_plot("lab5/usb/scope_i6.csv", "W")
+create__osci_plot("lab5/usb/scope_i7.csv", "W (court-circuité)")
+create__osci_plot("lab5/usb/scope_i8.csv", "5W (court-circuité)")
+#create__osci_plot("lab5/usb/scope_g2.csv", "W (ajusté)")
 
 
 #On créé une liste des résistances mesurées et une liste des tensions mesurées (SANS CONDENSATEUR):
