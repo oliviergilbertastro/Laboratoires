@@ -1,5 +1,3 @@
-from pylab import figure, cm
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -12,7 +10,7 @@ x1_max = 5.0
 x2_min = -5.0
 x2_max = 5.0
 
-x1, x2 = np.meshgrid(np.arange(x1_min,x1_max, 0.01), np.arange(x2_min,x2_max, 0.01))
+x1, x2 = np.meshgrid(np.arange(x1_min,x1_max, 0.005), np.arange(x2_min,x2_max, 0.005))
 
 y = E_y(x1,x2)
 
