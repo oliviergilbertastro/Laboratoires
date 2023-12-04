@@ -7,7 +7,6 @@ b=1
 def E_y(x1,x2):
     return np.abs((-1j/b)*np.sin((4*np.pi*x1)/(2*b))*np.cos((2*np.pi*x2)/(b)))
 
-
 x1_min = -5.0
 x1_max = 5.0
 x2_min = -5.0
