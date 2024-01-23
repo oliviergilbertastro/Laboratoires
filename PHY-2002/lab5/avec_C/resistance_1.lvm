@@ -1,0 +1,52 @@
+LabVIEW Measurement	
+Writer_Version	2
+Reader_Version	2
+Separator	Tab
+Decimal_Separator	,
+Multi_Headings	No
+X_Columns	No
+Time_Pref	Relative
+Operator	OLGIL12
+Date	2023/10/24
+Time	11:35:33,0759978294372558594
+***End_of_Header***	
+	
+Channels	1	
+Samples	30	
+Date	2023/10/24	
+Time	11:35:33,0759978294372558594	
+X_Dimension	Time	
+X0	0,0000000000000000E+0	
+Delta_X	1,000000	
+***End_of_Header***		
+X_Value	Untitled	Comment
+	14,137271
+	14,136971
+	14,136884
+	14,136123
+	14,136310
+	14,135873
+	14,135798
+	14,135174
+	14,134775
+	14,134738
+	14,134276
+	14,134064
+	14,134101
+	14,133677
+	14,133452
+	14,133539
+	14,133490
+	14,133053
+	14,133265
+	14,132616
+	14,132866
+	14,132741
+	14,132429
+	14,132266
+	14,132204
+	14,132004
+	14,131755
+	14,131543
+	14,131418
+	14,131056
