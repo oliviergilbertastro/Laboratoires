@@ -14,13 +14,13 @@ def resample_array(current, current_std):
     return np.asarray(new)
 
 def get_values_from_file(filename):
-    values = pd.read_csv(filename, delimiter="\t", decimal=",", skiprows=21)
+    values = pd.read_csv(filename, delimiter="\t", decimal=",", skiprows=3)
     return values
 
 
 
 
-
+#Quality plot:
 ax1 = plt.subplot(111)
 ticklabels = ax1.get_xticklabels()
 ticklabels.extend( ax1.get_yticklabels() )
