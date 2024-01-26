@@ -55,8 +55,10 @@ for i in tqdm(range(radius)):
         surface_profile.append(radial_intensity[i]-radial_intensity[i-1])
 
 
-
+ax1 = plt.subplot(111)
 plt.imshow(mean_img)
+circle1 = plt.Circle((895,422), radius, color='white', fill=False)
+ax1.add_patch(circle1)
 plt.show()
 
 ax1 = plt.subplot(111)
