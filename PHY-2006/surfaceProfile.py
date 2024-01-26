@@ -41,18 +41,21 @@ def net_flux(image, target_pos, noise_pos, radius=40, noise_radius=50, if_plot=F
     flux_noise = np.sum(noise_flux)
     flux_source = flux_within/pixels_inside# - (flux_noise/pixels_noise)*pixels_inside
 
-    return flux_source
+    return flux_within, pixels_inside
 
 
 radius = int(input("Radius?"))
 radial_intensity = []
+npix_profile = []
 surface_profile = []
 for i in tqdm(range(radius)):
-    radial_intensity.append(net_flux(mean_img, [895,422], [0,0], i, noise_radius=0))
+    flux, npix = net_flux(mean_img, [895,422], [0,0], i, noise_radius=0)
+    radial_intensity.append(flux)
+    npix_profile.append(npix)
     if i == 0:
-        surface_profile.append(radial_intensity[i])
+        surface_profile.append(radial_intensity[i]/npix_profile[i])
     else:
-        surface_profile.append(radial_intensity[i]-radial_intensity[i-1])
+        surface_profile.append((radial_intensity[i]-radial_intensity[i-1])/(npix_profile[i]-npix_profile[i-1]))
 
 
 ax1 = plt.subplot(111)
@@ -67,6 +70,7 @@ ticklabels.extend( ax1.get_yticklabels() )
 for label in ticklabels:
     label.set_fontsize(14)
 plt.plot(range(radius), surface_profile, color="red", label="données")
+#plt.hlines(255, 0, radius)
 plt.xlabel(r'Distance (pixels)', size=17)
 plt.ylabel(r'Intensité ($I_0$)', size=17)
 plt.show()
