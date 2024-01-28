@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.image import imread
 from tqdm import tqdm
 
-src_img = imread('PHY-2006/holes.jpg')
+src_img = imread('PHY-2006/Diffraction/cercle_0.2mm.jpg')
 red_img = src_img[:,:,0]
 mean_img = np.mean(src_img, 2)
 
@@ -49,7 +49,7 @@ radial_intensity = []
 npix_profile = []
 surface_profile = []
 for i in tqdm(range(radius)):
-    flux, npix = net_flux(red_img, [895,422], [0,0], i, noise_radius=0)
+    flux, npix = net_flux(red_img, [802,387], [0,0], i, noise_radius=0)
     radial_intensity.append(flux)
     npix_profile.append(npix)
     if i == 0:
@@ -60,7 +60,7 @@ for i in tqdm(range(radius)):
 
 ax1 = plt.subplot(111)
 plt.imshow(mean_img)
-circle1 = plt.Circle((895,422), radius, color='white', fill=False)
+circle1 = plt.Circle((802,387), radius, color='white', fill=False)
 ax1.add_patch(circle1)
 plt.show()
 
