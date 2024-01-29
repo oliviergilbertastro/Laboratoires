@@ -28,7 +28,7 @@ x_values = np.array(get_values_from_file('PHY-2006/Diffraction/mesures.csv').ilo
 y_values = np.array(get_values_from_file('PHY-2006/Diffraction/mesures.csv').iloc[:, 1])
 
 
-x_values = (x_values-679*np.ones(x_values.shape))/11500
+x_values = (x_values-685*np.ones(x_values.shape))/11500
 #x_values = (x_values-679*np.ones(x_values.shape))/11300
 theta_values = []
 for i in x_values:
@@ -77,7 +77,7 @@ ticklabels = ax1.get_xticklabels()
 ticklabels.extend( ax1.get_yticklabels() )
 for label in ticklabels:
     label.set_fontsize(14)
-plt.plot(theta_values, y_values/I_0, color="red", label="données")
+plt.plot(theta_values, y_values/I_0, '.', color="red", label="données")
 #plt.plot(theta_values, data_gy/I_0, label="données-gaussian")
 plt.xlabel(r'Position (m)', size=17)
 plt.ylabel(r'Intensité (grayscale)', size=17)
