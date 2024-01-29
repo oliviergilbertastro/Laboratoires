@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
+from matplotlib.colors import LogNorm, LinearSegmentedColormap, ListedColormap
 from scipy.special import j1
 from photutils.datasets import make_noise_image
 
@@ -25,6 +25,7 @@ class Diffraction():
             self.data = np.zeros(noise.shape) + noise
             self.data = np.where(self.data > 0, self.data, 0)
             self.data += patron_circulaire(x,y, lambda1, self.res, self.taille, ouverture=self.ouverture, distance=self.distance_to_screen)*(amplitude)
+            self.data = np.nan_to_num(self.data, nan=1)
 
     def show(self):
         print(np.nanmedian(self.data))
@@ -39,7 +40,14 @@ class Diffraction():
         ticklabels.extend( ax2.get_yticklabels() )
         for label in ticklabels:
             label.set_fontsize(14)
-        ax1.imshow(self.data, extent=[x1,x2,y1,y2], vmax=0.1, cmap='gist_heat')
+        N = 256
+        vals = np.ones((N, 4))
+        vals[:, 0] = np.linspace(0/256, 1, N)
+        vals[:, 1] = np.linspace(0/256, 0/256, N)
+        vals[:, 2] = np.linspace(0/256, 0/256, N)
+        custom_cmap = ListedColormap(vals)
+        sim = ax1.imshow(self.data, extent=[x1,x2,y1,y2], vmin=0.003, vmax=0.04, cmap=custom_cmap)
+        #fig.colorbar(sim, ax=ax1)
         ax1.set_xlabel(r'Distance (cm)', size=17)
         ax1.set_ylabel(r'Distance (cm)', size=17)
         #plt.show()
@@ -61,7 +69,7 @@ image = Diffraction(
                     lambda1=650E-9, #laser de 650nm
                     noise_level=0,
                     noise_deviation=0.01,
-                    amplitude=4,
+                    amplitude=1,
                     distance_to_screen=0.255,
                     ouverture=0.0002
                     )
