@@ -22,18 +22,18 @@ def get_values_from_file(filename):
 #Distance écran-slit:
 l = 0.37
 l_sigma = 0.002
-l = l
+l = 1
 a_th=0.04E-3
 d_th=0.50E-3
+
 
 x_values = np.array(get_values_from_file('PHY-2006/Diffraction/mesures2.csv').iloc[:, 0])
 y_values = np.array(get_values_from_file('PHY-2006/Diffraction/mesures2.csv').iloc[:, 1])
 
 
-plt.plot(x_values, y_values)
-plt.show()
 
-x_values = (x_values-622*np.ones(x_values.shape))/8620
+
+x_values = (x_values-622*np.ones(x_values.shape))/16000
 theta_values = []
 for i in x_values:
     theta_values.append(np.arctan(i/l))
@@ -41,14 +41,14 @@ theta_values = np.array(theta_values)
 lama = 650E-9
 I_0 = np.max(y_values)
 
-
+N=2
 def fonc_fit(theta, a, d):
     k1 = (np.pi*a*np.sin(theta))/lama
     k2 = (np.pi*d*np.sin(theta))/lama
-    return ((np.sin(k1)/k1)**2)*((np.sin(2*k2)/(2*np.sin(k2)))**2)
+    return ((np.sin(k1)/k1)**2)*((np.sin(N*k2)/(N*np.sin(k2)))**2)
 
 
-res = curve_fit(fonc_fit, theta_values, y_values/I_0, p0=[a_th, d_th])[0]
+res = curve_fit(fonc_fit, np.concatenate((theta_values[:450], theta_values[750:])), np.concatenate((y_values[:450], y_values[750:]))/I_0, p0=[a_th, d_th])[0]
 print(res)
 
 
