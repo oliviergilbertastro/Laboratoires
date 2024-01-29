@@ -4,14 +4,12 @@ from matplotlib.colors import LogNorm
 from scipy.special import j1
 from photutils.datasets import make_noise_image
 
-lambda_laser = 650E-9
 
-def fonction_circulaire(x, y, lambda1, res, taille, ouverture=0.2E-3, distance=37E-2):
+def patron_circulaire(x, y, lambda1, res, taille, ouverture=0.2E-3, distance=37E-2):
     ratio = taille/res
     r = ouverture/2
     theta = np.arctan(np.sqrt(x**2+y**2)*ratio/distance)
     argument = 2*np.pi*r*np.sin(theta)/lambda1
-    #argument = 2*np.pi*r/lambda1*(np.sqrt(x**2+y**2)*ratio/distance)
     return ((2*j1(argument))/(argument))**2
 
 class Diffraction():
@@ -26,7 +24,7 @@ class Diffraction():
             noise = np.array(make_noise_image((ny, nx), distribution='gaussian', mean=noise_level, stddev=noise_deviation, seed=None))
             self.data = np.zeros(noise.shape) + noise
             self.data = np.where(self.data > 0, self.data, 0)
-            self.data += fonction_circulaire(x,y, lambda1, self.res, self.taille, ouverture=self.ouverture, distance=self.distance_to_screen)*(amplitude)
+            self.data += patron_circulaire(x,y, lambda1, self.res, self.taille, ouverture=self.ouverture, distance=self.distance_to_screen)*(amplitude)
 
     def show(self):
         print(np.nanmedian(self.data))
@@ -37,6 +35,8 @@ class Diffraction():
         ax2 = plt.subplot(122, sharex=ax1)
         ticklabels = ax1.get_xticklabels()
         ticklabels.extend( ax1.get_yticklabels() )
+        ticklabels.extend( ax2.get_xticklabels() )
+        ticklabels.extend( ax2.get_yticklabels() )
         for label in ticklabels:
             label.set_fontsize(14)
         ax1.imshow(self.data, extent=[x1,x2,y1,y2], vmax=0.1, cmap='gist_heat')
@@ -56,8 +56,8 @@ class Diffraction():
 
 #res=1000-10000 est le meilleur qualité/prix
 image = Diffraction(
-                    taille=0.1, #environ 10cm
-                    res=2500,
+                    taille=0.01, #environ 10cm
+                    res=2000,
                     lambda1=650E-9, #laser de 650nm
                     noise_level=0,
                     noise_deviation=0.01,
