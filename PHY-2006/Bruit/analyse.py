@@ -8,6 +8,7 @@ data = np.loadtxt('PHY-2006/Bruit/signalSimu.txt')
 cycles = [[],]
 last_dim = 0
 
+
 for i in range(len(data)):
     dim = int(i // 100)
     if dim != last_dim:
