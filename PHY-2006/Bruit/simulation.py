@@ -28,7 +28,7 @@ signal = SignalBruit(
                         tension=5,
                         period=100,
                         noise_mean=0,
-                        noise_std=0.05,
-                        number_of_cycles=50
+                        noise_std=0.15,
+                        number_of_cycles=10
                         )
 signal.saveTo('PHY-2006/Bruit/signalSimu.txt')
