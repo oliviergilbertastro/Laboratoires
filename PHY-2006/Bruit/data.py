@@ -78,3 +78,11 @@ ax2.set_title(f'Données moyennées sur {last_dim+1} cycles')
 ax3.plot(np.median(cycles, axis=0))
 ax3.set_title(f'Données "médiannées" sur {last_dim+1} cycles')
 plt.show()
+
+
+print('LOW:', np.mean(np.mean(cycles, axis=0)[500:4500]))
+print('HIGH:', np.mean(np.mean(cycles, axis=0)[5500:9500]))
+print('Difference:', np.mean(np.mean(cycles, axis=0)[5500:9500])-np.mean(np.mean(cycles, axis=0)[500:4500]))
+plt.plot(np.mean(cycles, axis=0)[500:4500])
+plt.plot(np.mean(cycles, axis=0)[5500:9500])
+plt.show()
