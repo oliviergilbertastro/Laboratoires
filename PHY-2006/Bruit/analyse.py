@@ -10,7 +10,7 @@ last_dim = 0
 
 
 for i in range(len(data)):
-    dim = int(i // 5000)
+    dim = int(i // 100)
     if dim != last_dim:
         cycles.append([])
     cycles[dim].append(data[i])
