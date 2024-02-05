@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 k_0 = 1
 gamma = 1
-w_0 = 10
+w_0 = 2
 n = 1
 
 

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 
 def get_values_from_file(filename):
@@ -48,17 +49,34 @@ print('STD low:', np.std(allLOW))
 print('STD high:', np.std(allHIGH))
 print('--------------------')
 
-ax1, ax2 = plt.subplot(121), plt.subplot(122)
-counts, bins = np.histogram(allLOW, bins=200)
-ax1.stairs(counts, bins)
-counts, bins = np.histogram(allHIGH, bins=200)
-ax2.stairs(counts, bins)
-ax1.set_title('Low')
-ax2.set_title('High')
+ax1, ax2 = plt.subplot(111), plt.subplot(111)
+
+
+mu1, std1 = norm.fit(allLOW) 
+mu2, std2 = norm.fit(allHIGH)
+
+
+
+ax1.hist(allLOW, 23, density=True, alpha=0.5, color='b', label='Fermé')
+xmin1, xmax1 = ax1.get_xlim()
+x1 = np.linspace(xmin1, xmax1, 100)
+p1 = norm.pdf(x1, mu1, std1)
+ax2.hist(allHIGH, 24, density=True, alpha=0.5, color='r', label='Ouvert')
+xmin2, xmax2 = ax2.get_xlim()
+x2 = np.linspace(xmin2, xmax2, 100)
+p2 = norm.pdf(x2, mu2, std2)
+
+ax1.plot(x1, p1, 'k', linewidth=3, color='b', linestyle='dashed')
+ax2.plot(x2, p2, 'k', linewidth=3, color='r', linestyle='dashed')
+
+ax1.vlines(mu1, 0, 35, linewidth=2, color='b', alpha=0.8, linestyle=(0, (1,1)))
+ax2.vlines(mu2, 0, 35, linewidth=2, color='r', alpha=0.8, linestyle=(0, (1,1)))
+middle = (mu1+mu2)/2
+plt.annotate('', xy=(mu1,35), xytext=(mu2,35), arrowprops=dict(arrowstyle='<->'))
+plt.text(middle-0.018, 36, f'$\Delta$V = 0.0381V', fontsize=16)
 ax1.set_xlabel(r'Tension (V)', size=17)
-ax1.set_ylabel(r'Count', size=17)
-ax2.set_xlabel(r'Tension (V)', size=17)
-ax2.set_ylabel(r'Count', size=17)
+ax1.set_ylabel(r'Densité de probabilité normalisée', size=17)
+plt.legend()
 plt.show()
 
 analyse = []
