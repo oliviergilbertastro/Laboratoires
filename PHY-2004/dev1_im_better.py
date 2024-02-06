@@ -3,13 +3,9 @@ import matplotlib.pyplot as plt
 
 #Définir les fonctions
 def calculate_n_squared(delta, F, B):
-    term1 = 1 / 2 * (1 + (F * delta) / (delta**2 + B**2))
-    term2 = 1 / 2 * np.sqrt(1 + ((2 * F) / (delta**2 + B**2)) * (delta + F / 2))
-
     
-    n_squared = (term1 + term2)**0.5
+    return np.sqrt(1/2*((1+(F*delta)/(delta**2+B**2))+np.sqrt(1+((2*F)/(delta**2+B**2))*(delta+F/2))))
 
-    return n_squared
 def alpha_calculer(n, F, B, k_0, delta):
     alpha = (k_0)/( n)*((F * B)/(delta**2 + B**2))
 

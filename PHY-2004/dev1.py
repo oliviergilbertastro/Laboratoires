@@ -11,7 +11,7 @@ def d(w):
 def n(w, gamma):
     delta=d(w)
     B=gamma*w
-    return np.sqrt(1/2*(1+F*delta/(delta**2+B**2)+np.sqrt(1+2*F*delta/(delta**2+B**2)*(delta+F/2))))
+    return np.sqrt(1/2*(1+F*delta/(delta**2+B**2)+np.sqrt(1+2*F/(delta**2+B**2)*(delta+F/2))))
 
 def alpha(w, gamma):
     delta=d(w)
@@ -21,7 +21,7 @@ def alpha(w, gamma):
 
 
 
-w_sim = np.linspace(0, 2*w_0, 1000000)
+w_sim = np.linspace(0, 2*w_0, 10000)
 
 ax1 = plt.subplot(121)
 ticklabels = ax1.get_xticklabels()
@@ -35,12 +35,12 @@ for label in ticklabels:
     label.set_fontsize(14)
 ax1.plot(w_sim, n(w_sim, 0.1), label='$\gamma=0.1$')
 ax1.plot(w_sim, n(w_sim, 0.01), label='$\gamma=0.01$')
-ax1.set_xlabel(r'$\omega$', fontsize=17)
+ax1.set_xlabel(r'$\omega$ [rad/s]', fontsize=17)
 ax1.set_ylabel(r'$n$', fontsize=17)
 ax2.plot(w_sim, alpha(w_sim, 0.1), label='$\gamma=0.1$')
 ax2.plot(w_sim, alpha(w_sim, 0.01), label='$\gamma=0.01$')
-ax2.set_xlabel(r'$\omega$', fontsize=17)
-ax2.set_ylabel(r'$\alpha$', fontsize=17)
+ax2.set_xlabel(r'$\omega$ [rad/s]', fontsize=17)
+ax2.set_ylabel(r'$\alpha$ [m$^{-1}$]', fontsize=17)
 ax1.legend()
 ax2.legend()
 plt.show()
