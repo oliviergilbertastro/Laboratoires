@@ -30,7 +30,8 @@ for i in clusters_of_data:
         data_highs.append(i)
     else:
         data_lows.append(i)
-
+plt.plot(data)
+plt.show()
 #for i in range(len(clusters_of_data)-1):
 #    plt.plot(range(i*5000, (i+1)*5000), clusters_of_data[i])
 #plt.plot(range(len(data_highs)), data_highs)
