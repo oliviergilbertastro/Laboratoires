@@ -15,15 +15,24 @@ def open_spectrum(filepath):
 
 
 #Start with the sun
+sun_wav_list, sun_counts_list, sun_energydensity_list = [], [], []
 
-sun_wav, sun_counts, sun_energydensity = open_spectrum('PHY-2006/Projet1/data/sun/sun_USB4F104151__0__16-39-31-696.txt')
+for i in range(1, 11):
+    w, c, d = open_spectrum(f'PHY-2006/Projet1/data/sun/sun{i}.txt')
+    sun_wav_list.append(w)
+    sun_counts_list.append(c)
+    sun_energydensity_list.append(d)
 
 
+sun_wav = np.mean(sun_wav_list, axis=0)
+sun_counts = np.mean(sun_counts_list, axis=0)
+sun_energydensity = np.mean(sun_energydensity_list, axis=0)
 
 
 h = 6.62607015E-34 #m^2.kg.s^-1
 c = 299792458 #m/s
 k_B = 1.380649E-23 #m^2.kg.s^-2.K^-1
+b = 2.897771955E-3 #m.K
 
 def planckslaw(wav, temp):
     wav = wav*10**(-9)
@@ -32,13 +41,21 @@ def planckslaw(wav, temp):
 wav_sim = np.linspace(200, 900, 1000)
 sed_sim = planckslaw(wav_sim, 5500)
 
+#Fit Wien's law
+wav_peak = sun_wav[np.where(sun_counts == np.max(sun_counts))]
+temp_wien = b/(wav_peak*10**(-9))
+print('Wavelenght peak [nm]:', wav_peak)
+print('Temperature:', temp_wien)
+print(b/5778)
 
 
-#Fit
+#Fit planck's law
 from scipy.optimize import curve_fit
 plt.plot(sun_wav)
+plt.xlabel('Index')
+plt.ylabel('$\lambda$ [nm]')
 plt.show()
-temp_experimentale = curve_fit(planckslaw, sun_wav[1000:3000], sun_energydensity[1000:3000], p0=[5500])[0]
+temp_experimentale = curve_fit(planckslaw, sun_wav[1600:2500], sun_energydensity[1600:2500], p0=[6500])[0]
 
 sed_fit = planckslaw(wav_sim, temp_experimentale)
 
@@ -48,9 +65,9 @@ ticklabels.extend( ax1.get_yticklabels() )
 for label in ticklabels:
     label.set_fontsize(14)
 ax1.plot(sun_wav, sun_energydensity, label='Données')
-ax1.plot(wav_sim, sed_sim, label='Corps noir de $T=5500$K')
+ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={np.round(temp_wien)}$K')
 ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={np.round(temp_experimentale)}$K')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
-plt.ylabel("Intensité renormalisée", fontsize=17)
+plt.ylabel("$I/I_\mathrm{max}$", fontsize=17)
 plt.legend(fontsize=14)
 plt.show()
