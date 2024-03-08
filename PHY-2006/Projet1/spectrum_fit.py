@@ -46,12 +46,14 @@ for i in range(11, 16):
 sun_wav = np.mean(sun_wav_list, axis=0)
 sun_counts = np.mean(sun_counts_list, axis=0)
 sun_radiance = []
+sun_radiance_uncorr = []
 for i in range(len(sun_wav)):
     #Integration time of 2ms, so we calculate the radiance in W/m^2/nm
     photon_count = sun_counts[i]*sensitivity(sun_wav[i])
     photon_energy = h*c/(sun_wav[i]*10**(-9))
     exp_time = 0.0005
-    sun_radiance.append(photon_count*photon_energy/exp_time/(np.pi*(20E-6)**2)/0.56)
+    sun_radiance.append((photon_count*photon_energy/exp_time/(np.pi*(20E-6)**2))/0.56)
+    sun_radiance_uncorr.append(photon_count*photon_energy/exp_time/(np.pi*(20E-6)**2))
 sun_energydensity = np.mean(sun_energydensity_list, axis=0)
 
 ax1 = plt.subplot(111)
@@ -108,12 +110,13 @@ ticklabels = ax1.get_xticklabels()
 ticklabels.extend( ax1.get_yticklabels() )
 for label in ticklabels:
     label.set_fontsize(14)
-sed_sim = sed_sim/np.max(sed_sim)
-sed_fit = sed_fit/np.max(sed_fit)
-sun_radiance = sun_radiance/np.max(sun_radiance)
-for i in range(len(sun_wav_list)):
-    ax1.plot(sun_wav_list[i], sun_energydensity_list[i], color='purple')
-ax1.plot(sun_wav, sun_radiance, label='Données')
+#sed_sim = sed_sim/np.max(sed_sim)
+#sed_fit = sed_fit/np.max(sed_fit)
+#sun_radiance = sun_radiance/np.max(sun_radiance)
+#for i in range(len(sun_wav_list)):
+#    ax1.plot(sun_wav_list[i], sun_energydensity_list[i], color='purple')
+ax1.plot(sun_wav, sun_radiance, label='Données corrigées')
+ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
 
 ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={round(temp_wien[0])}$K')
 ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale[0])}$K')
