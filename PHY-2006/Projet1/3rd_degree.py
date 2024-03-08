@@ -12,7 +12,7 @@ res = curve_fit(polynomial, x_data, y_data)[0]
 
 x_fit = np.linspace(200, 900, 1000)
 y_fit = polynomial(x_fit, res[0], res[1], res[2], res[3])
-
+print(res)
 plt.plot(x_data, y_data, 'o')
 plt.plot(x_fit, y_fit)
 plt.show()
