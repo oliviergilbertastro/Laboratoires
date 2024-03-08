@@ -446,10 +446,10 @@ def smac_dir ( r_surf, tetas, phis, tetav, phiv,pressure,taup550, uo3, uh2o, coe
 #=============================================================================
 if __name__=="__main__" :
     #example
-    theta_s = 45
-    theta_v = 5
-    phi_s =  200
-    phi_v = -160
+    theta_s=30 #solar zenith angle
+    phi_s=180  #solar azimuth angle
+    theta_v=0  #viewing zenith angle
+    phi_v=0    #viewing azimuth
     r_toa=0.2
     ######################################lecture des coefs_smac
     nom_smac ='PHY-2006/Projet1/data/COEFS/coef_FORMOSAT2_B1_CONT.dat'
