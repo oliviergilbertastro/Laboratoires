@@ -56,20 +56,34 @@ for i in range(len(sun_wav)):
     sun_radiance_uncorr.append(photon_count*photon_energy/exp_time/(np.pi*(20E-6)**2))
 sun_energydensity = np.mean(sun_energydensity_list, axis=0)
 
-ax1 = plt.subplot(111)
+
+
+
+ax1 = plt.subplot(122)
+ax2 = plt.subplot(121, sharex=ax1)
 ticklabels = ax1.get_xticklabels()
 ticklabels.extend( ax1.get_yticklabels() )
+ticklabels.extend( ax2.get_xticklabels() )
+ticklabels.extend( ax2.get_yticklabels() )
 for label in ticklabels:
     label.set_fontsize(14)
-ax1.plot(sun_wav, sun_radiance, label='Données')
+ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
 #ax1.plot(atm_wav, atm_counts, label=f'Atmosphère')
-plt.xlabel('$\lambda$ [nm]', fontsize=17)
-plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
-plt.legend(fontsize=14)
+ax1.set_xlabel('$\lambda$ [nm]', fontsize=17)
+ax1.set_ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
+ax1.legend(fontsize=14)
+ax2.plot(sun_wav, sun_counts, label='Données')
+#ax1.plot(atm_wav, atm_counts, label=f'Atmosphère')
+ax2.set_xlabel('$\lambda$ [nm]', fontsize=17)
+ax2.set_ylabel("Counts", fontsize=17)
+ax2.legend(fontsize=14)
 plt.show()
 
 
-
+plt.plot(sun_wav, sun_radiance_uncorr/sun_counts)
+plt.xlabel('$\lambda$ [nm]', fontsize=17)
+plt.ylabel("Radiance/Counts", fontsize=17)
+plt.show()
 
 
 
