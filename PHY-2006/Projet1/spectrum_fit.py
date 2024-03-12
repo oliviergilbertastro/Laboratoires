@@ -92,32 +92,43 @@ plt.show()
 distance_to_sun = 1.4852E11 #m
 solid_angle = (np.pi*(20E-6)**2)/(4*np.pi*distance_to_sun**2)
 
-def planckslaw_radiance(wav, temp):
+def planckslaw_radiance(wav, temp, scale):
     wav = wav*10**(-9)
-    return 2*np.pi*h*c**2/wav**5*(1/(np.exp(h*c/(wav*k_B*temp))-1))
+    return scale*2*np.pi*h*c**2/wav**5*(1/(np.exp(h*c/(wav*k_B*temp))-1))
 
+def scale_factor(y, scale):
+    return y*scale
 
+from scipy.optimize import curve_fit
 
 #Fit Wien's law
 wav_peak = sun_wav[np.where(sun_radiance == np.max(sun_radiance))]
 temp_wien = b/(wav_peak*10**(-9))
 print('Wavelenght peak [nm]:', wav_peak)
 print('Temperature:', temp_wien)
-print(b/5778)
+print('Theoretical wavelenght peak:', round(b/5778*10**9), 'nm')
 
-wav_sim = np.linspace(200, 1900, 1000)
-sed_sim = planckslaw_radiance(wav_sim, temp_wien)
+sed_sim = planckslaw_radiance(sun_wav, temp_wien, 1)
+
+sed_sim_scale = curve_fit(scale_factor, sed_sim[1000:1500], sun_radiance[1000:1500])[0]
+print('Sed_sim_scale', sed_sim_scale)
+wav_sim = np.linspace(200, 1000, 1000)
+sed_sim = planckslaw_radiance(wav_sim, temp_wien, sed_sim_scale)
 
 #Fit planck's law
-from scipy.optimize import curve_fit
-if False:
+
+if True:
     plt.plot(sun_wav)
     plt.xlabel('Index')
     plt.ylabel('$\lambda$ [nm]')
     plt.show()
-temp_experimentale = curve_fit(planckslaw_radiance, sun_wav[1600:2500], sun_radiance[1600:2500], p0=[6500])[0]
-temp_experimentale = curve_fit(planckslaw_radiance, sun_wav, sun_radiance, p0=[6500])[0]
-sed_fit = planckslaw_radiance(wav_sim, temp_experimentale)
+#temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav[1600:2500], sun_radiance[1600:2500], p0=[5500, 1E-13])[0]
+#temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav, sun_radiance, p0=[5500, 1E-13])[0]
+temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav[1300:2000], sun_radiance[1300:2000], p0=[5500, 1E-13])[0]
+sed_fit = planckslaw_radiance(wav_sim, temp_experimentale, scale)
+print('*************FIT***************')
+print('T', temp_experimentale)
+print('Scale', scale)
 
 ax1 = plt.subplot(111)
 ticklabels = ax1.get_xticklabels()
@@ -133,7 +144,7 @@ ax1.plot(sun_wav, sun_radiance, label='Données corrigées')
 ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
 
 ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={round(temp_wien[0])}$K')
-ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale[0])}$K')
+ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale)}$K')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
 plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
 plt.legend(fontsize=14)
