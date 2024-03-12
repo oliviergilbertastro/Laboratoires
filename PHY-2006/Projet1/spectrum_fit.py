@@ -53,12 +53,16 @@ for i in range(len(sun_wav)):
     photon_count = sun_counts[i]*sensitivity(sun_wav[i])
     photon_energy = h*c/(sun_wav[i]*10**(-9))
     exp_time = 0.0005
-    sun_radiance.append((photon_count*photon_energy/exp_time/(np.pi*(20E-6)**2))/0.56)
+    sun_radiance.append((photon_count*photon_energy/exp_time/(np.pi*(fiber_diameter/2)**2)))
     sun_radiance_uncorr.append(photon_count*photon_energy/exp_time/(np.pi*(fiber_diameter/2)**2))
 sun_energydensity = np.mean(sun_energydensity_list, axis=0)
 
-
-
+#Correct for telluric absorption
+from extinction_calculator import *
+kappa_list = []
+for i in range(len(sun_wav)):
+    kappa_list.append(polynomial(sun_wav[i], res[0], res[1], res[2], res[3], res[4]))
+extinction_percentages = mag_to_percentage(kappa_list, observation_angle=73/180*np.pi)
 
 ax1 = plt.subplot(122)
 ax2 = plt.subplot(121, sharex=ax1)
