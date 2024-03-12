@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.signal import boxcar
+from pylab import r_
 
 h = 6.62607015E-34 #m^2.kg.s^-1
 c = 299792458 #m/s
@@ -8,6 +10,13 @@ k_B = 1.380649E-23 #m^2.kg.s^-2.K^-1
 b = 2.897771955E-3 #m.K
 
 fiber_diameter = 600E-6 #m
+
+def smooth(x, smoothing_param=3):
+    window_len=smoothing_param*2+1
+    s=r_[x[window_len-1:0:-1],x,x[-1:-window_len:-1]]
+    w=boxcar(smoothing_param*2+1)
+    y=np.convolve(w/np.sum(w),s,mode='valid')
+    return y[smoothing_param:-smoothing_param] 
 
 def open_spectrum(filepath):
     file = pd.read_csv(filepath, delimiter="\t", decimal=",", skiprows=14, encoding='latin-1', engine='python')
@@ -60,9 +69,11 @@ sun_energydensity = np.mean(sun_energydensity_list, axis=0)
 #Correct for telluric absorption
 from extinction_calculator import *
 kappa_list = []
+extinction_percentages = []
 for i in range(len(sun_wav)):
     kappa_list.append(polynomial(sun_wav[i], res[0], res[1], res[2], res[3], res[4]))
-extinction_percentages = mag_to_percentage(kappa_list, observation_angle=73/180*np.pi)
+    extinction_percentages.append(mag_to_percentage(kappa_list[i], observation_angle=40/180*np.pi))
+    sun_radiance[i] = correct_intensity(sun_radiance[i], extinction_percentages[i])
 
 ax1 = plt.subplot(122)
 ax2 = plt.subplot(121, sharex=ax1)
@@ -108,10 +119,17 @@ def planckslaw_radiance(wav, temp, scale):
 def scale_factor(y, scale):
     return y*scale
 
-from scipy.optimize import curve_fit
+smoothed_sun_radiance = smooth(sun_radiance, smoothing_param=100)
+plt.plot(sun_wav, sun_radiance, label='Données corrigées')
+plt.plot(sun_wav, smoothed_sun_radiance, label='Données smoothées')
+plt.legend()
+plt.xlabel('$\lambda$ [nm]')
+plt.show()
 
+from scipy.optimize import curve_fit
+print(np.where(sun_radiance[1000:] == np.max(smoothed_sun_radiance[1000:]))[0])
 #Fit Wien's law
-wav_peak = sun_wav[np.where(sun_radiance == np.max(sun_radiance))]
+wav_peak = sun_wav[1000+(np.where(smoothed_sun_radiance[1000:] == np.max(smoothed_sun_radiance[1000:])))[0]]
 temp_wien = b/(wav_peak*10**(-9))
 print('Wavelenght peak [nm]:', wav_peak)
 print('Temperature:', temp_wien)
@@ -139,6 +157,8 @@ print('*************FIT***************')
 print('T', temp_experimentale)
 print('Scale', scale)
 
+
+
 ax1 = plt.subplot(111)
 ticklabels = ax1.get_xticklabels()
 ticklabels.extend( ax1.get_yticklabels() )
@@ -154,6 +174,26 @@ ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
 
 ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={round(temp_wien[0])}$K', linestyle='dotted')
 ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale)}$K', linestyle='dashed')
+plt.xlabel('$\lambda$ [nm]', fontsize=17)
+plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
+plt.legend(fontsize=14)
+plt.show()
+
+
+
+ax1 = plt.subplot(111)
+ticklabels = ax1.get_xticklabels()
+ticklabels.extend( ax1.get_yticklabels() )
+for label in ticklabels:
+    label.set_fontsize(14)
+#sed_sim = sed_sim/np.max(sed_sim)
+#sed_fit = sed_fit/np.max(sed_fit)
+#sun_radiance = sun_radiance/np.max(sun_radiance)
+#for i in range(len(sun_wav_list)):
+#    ax1.plot(sun_wav_list[i], sun_energydensity_list[i], color='purple')
+ax1.plot(wav_sim, planckslaw_radiance(wav_sim, 5778, 1), label=f'Théorique $T={5778}$K', linestyle='dotted')
+ax1.plot(wav_sim, planckslaw_radiance(wav_sim, temp_wien, 1), label=f'Ajusté Wien $T={round(temp_wien[0])}$K', linestyle='dotted')
+ax1.plot(wav_sim, planckslaw_radiance(wav_sim, temp_experimentale, 1), label=f'Ajusté Planck $T={round(temp_experimentale)}$K', linestyle='dashed')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
 plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
 plt.legend(fontsize=14)
