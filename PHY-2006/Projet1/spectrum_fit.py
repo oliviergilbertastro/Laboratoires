@@ -7,6 +7,7 @@ c = 299792458 #m/s
 k_B = 1.380649E-23 #m^2.kg.s^-2.K^-1
 b = 2.897771955E-3 #m.K
 
+fiber_diameter = 600E-6 #m
 
 def open_spectrum(filepath):
     file = pd.read_csv(filepath, delimiter="\t", decimal=",", skiprows=14, encoding='latin-1', engine='python')
@@ -53,7 +54,7 @@ for i in range(len(sun_wav)):
     photon_energy = h*c/(sun_wav[i]*10**(-9))
     exp_time = 0.0005
     sun_radiance.append((photon_count*photon_energy/exp_time/(np.pi*(20E-6)**2))/0.56)
-    sun_radiance_uncorr.append(photon_count*photon_energy/exp_time/(np.pi*(20E-6)**2))
+    sun_radiance_uncorr.append(photon_count*photon_energy/exp_time/(np.pi*(fiber_diameter/2)**2))
 sun_energydensity = np.mean(sun_energydensity_list, axis=0)
 
 
@@ -90,7 +91,7 @@ plt.show()
 
 
 distance_to_sun = 1.4852E11 #m
-solid_angle = (np.pi*(20E-6)**2)/(4*np.pi*distance_to_sun**2)
+solid_angle = (np.pi*(fiber_diameter/2)**2)/(4*np.pi*distance_to_sun**2)
 
 def planckslaw_radiance(wav, temp, scale):
     wav = wav*10**(-9)
@@ -148,7 +149,7 @@ ax1.plot(sun_wav, sun_radiance, label='Données corrigées')
 ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
 
 ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={round(temp_wien[0])}$K', linestyle='dotted')
-ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale)}$K')
+ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale)}$K', linestyle='dashed')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
 plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
 plt.legend(fontsize=14)
