@@ -94,7 +94,11 @@ solid_angle = (np.pi*(20E-6)**2)/(4*np.pi*distance_to_sun**2)
 
 def planckslaw_radiance(wav, temp, scale):
     wav = wav*10**(-9)
-    return scale*2*np.pi*h*c**2/wav**5*(1/(np.exp(h*c/(wav*k_B*temp))-1))
+    return scale*2*h*c**2/wav**5*(1/(np.exp(h*c/(wav*k_B*temp))-1))
+
+#def planckslaw_radiance(wav, temp, scale):
+#    wav = wav*10**(-9)
+#    return scale*8*np.pi*h*c/wav**5*(1/(np.exp(h*c/(wav*k_B*temp))-1))
 
 def scale_factor(y, scale):
     return y*scale
