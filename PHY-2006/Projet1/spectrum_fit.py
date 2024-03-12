@@ -147,7 +147,7 @@ for label in ticklabels:
 ax1.plot(sun_wav, sun_radiance, label='Données corrigées')
 ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
 
-ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={round(temp_wien[0])}$K')
+ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={round(temp_wien[0])}$K', linestyle='dotted')
 ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale)}$K')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
 plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
