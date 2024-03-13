@@ -21,7 +21,7 @@ def planckslaw_radiance(wav, temp):
 wavelengths = np.linspace(7, 1007, 1000)
 blackbodies = []
 blackbodies_temp = []
-for t in range(3000, 8000):
+for t in range(3000, 13000):
     blackbodies.append(planckslaw_radiance(wavelengths, t))
     blackbodies_temp.append(t)
 
@@ -98,8 +98,6 @@ for i in tqdm(range(len(blackbodies))):
         plt.plot(wavelengths, r_array[r_array >= 0], color='red')
         plt.show()
 
-
-
 ax1 = plt.subplot(111)
 ticklabels = ax1.get_xticklabels()
 ticklabels.extend( ax1.get_yticklabels() )
@@ -109,6 +107,39 @@ plt.plot(blackbodies_temp, B_R_ratio)
 plt.xlabel('Temperature [K]', fontsize=17)
 plt.ylabel("B/R ratio", fontsize=17)
 plt.show()
+
+#Fit function to BR ratio
+def fonc_fit(x, c1, c2, c3, c4, c5, c6):
+    return c1+c2*x+c3*x**2+c4*x**3+c5*x**4+c6*x**5
+ratio_fit = curve_fit(fonc_fit, B_R_ratio, blackbodies_temp)[0]
+
+temps_sim = []
+for i in range(len(B_R_ratio)):
+    temps_sim.append(fonc_fit(B_R_ratio[i], ratio_fit[0], ratio_fit[1], ratio_fit[2], ratio_fit[3], ratio_fit[4], ratio_fit[5]))
+
+
+
+ax1 = plt.subplot(121)
+ax2 = plt.subplot(122)
+ticklabels = ax1.get_xticklabels()
+ticklabels.extend( ax1.get_yticklabels() )
+ticklabels.extend( ax2.get_xticklabels() )
+ticklabels.extend( ax2.get_yticklabels() )
+for label in ticklabels:
+    label.set_fontsize(14)
+ax1.plot(B_R_ratio, blackbodies_temp, label='Fonction')
+ax1.plot(B_R_ratio, temps_sim, label='Ajustement')
+ax1.set_ylabel('Température [K]', fontsize=17)
+ax1.set_xlabel("B/R ratio", fontsize=17)
+ax1.legend()
+
+ax2.plot(B_R_ratio, np.array(temps_sim)-np.array(blackbodies_temp))
+ax2.set_ylabel('Résiduel [K]', fontsize=17)
+ax2.set_xlabel("B/R ratio", fontsize=17)
+plt.show()
+
+print(ratio_fit)
+
 
 #Process the actual pictures
 if False:
