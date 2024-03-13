@@ -82,14 +82,21 @@ plt.show()
 #We calcualte the B/R ratio as a function of the temperature by integrating the multiplication of the blackbody at temperature T with the functions:
 
 B_R_ratio = []
+B_G_ratio = []
+G_R_ratio = []
 B_sum = []
 R_sum = []
+G_sum = []
 for i in tqdm(range(len(blackbodies))):
     b_array = (blackbodies[i]*polynomial(wavelengths, resb[0], resb[1], resb[2], resb[3], resb[4], resb[5], resb[6], resb[7], resb[8], resb[9]))
     r_array = (blackbodies[i]*polynomial(wavelengths, resr[0], resr[1], resr[2], resr[3], resr[4], resr[5], resr[6], resr[7], resr[8], resr[9]))
+    g_array = (blackbodies[i]*polynomial(wavelengths, resg[0], resg[1], resg[2], resg[3], resg[4], resg[5], resg[6], resg[7], resg[8], resg[9]))
     B_sum.append(np.sum(b_array[b_array >= 0]))
     R_sum.append(np.sum(r_array[r_array >= 0]))
+    G_sum.append(np.sum(g_array[g_array >= 0]))
     B_R_ratio.append(B_sum[i]/R_sum[i])
+    B_G_ratio.append(B_sum[i]/G_sum[i])
+    G_R_ratio.append(G_sum[i]/R_sum[i])
 
 ax1 = plt.subplot(111)
 ticklabels = ax1.get_xticklabels()
@@ -100,6 +107,27 @@ plt.plot(blackbodies_temp, B_R_ratio)
 plt.xlabel('Température [K]', fontsize=17)
 plt.ylabel("Ratio B/R", fontsize=17)
 plt.show()
+
+if False:
+    ax1 = plt.subplot(111)
+    ticklabels = ax1.get_xticklabels()
+    ticklabels.extend( ax1.get_yticklabels() )
+    for label in ticklabels:
+        label.set_fontsize(14)
+    plt.plot(blackbodies_temp, B_G_ratio)
+    plt.xlabel('Température [K]', fontsize=17)
+    plt.ylabel("Ratio B/G", fontsize=17)
+    plt.show()
+
+    ax1 = plt.subplot(111)
+    ticklabels = ax1.get_xticklabels()
+    ticklabels.extend( ax1.get_yticklabels() )
+    for label in ticklabels:
+        label.set_fontsize(14)
+    plt.plot(blackbodies_temp, G_R_ratio)
+    plt.xlabel('Température [K]', fontsize=17)
+    plt.ylabel("Ratio G/R", fontsize=17)
+    plt.show()
 
 #Fit function to BR ratio
 def fonc_fit(x, c1, c2, c3, c4, c5, c6):

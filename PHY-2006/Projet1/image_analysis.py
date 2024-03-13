@@ -42,16 +42,19 @@ plt.show()
 
 betelegeuse_im = np.array(Image.open("PHY-2006/Projet1/data/stars_pictures/betelgeuse4.tif"))
 bet_red = betelegeuse_im[:, :, 0]
+bet_green = betelegeuse_im[:, :, 1]
 bet_blue = betelegeuse_im[:, :, 2]
-bet_ratio = bet_blue/bet_red
+bet_ratio = bet_blue/bet_green
 
 
-ax1 = plt.subplot(131)
-ax2 = plt.subplot(132, sharex=ax1, sharey=ax1)
-ax3 = plt.subplot(133, sharex=ax1, sharey=ax1)
+ax1 = plt.subplot(221)
+ax2 = plt.subplot(222, sharex=ax1, sharey=ax1)
+ax3 = plt.subplot(223, sharex=ax1, sharey=ax1)
+ax4 = plt.subplot(224, sharex=ax1, sharey=ax1)
 ax1.imshow(bet_red, cmap='Reds')
 ax2.imshow(bet_blue, cmap='Blues')
-ax3.imshow(bet_ratio)
+ax3.imshow(bet_green, cmap='Greens')
+ax4.imshow(bet_ratio)
 plt.suptitle('Betelgeuse')
 plt.show()
 
