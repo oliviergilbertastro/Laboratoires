@@ -21,7 +21,25 @@ def temperature_from_BR(br):
     return c1+c2*br+c3*br**2+c4*br**3+c5*br**4+c6*br**5
 
 #Process the actual pictures
-betelegeuse_im = np.array(Image.open("PHY-2006/Projet1/data/stars_pictures/betelgeuse2.tif"))
+sun_im = np.array(Image.open("PHY-2006/Projet1/data/stars_pictures/Sun_v5.png"))
+sun_red = sun_im[:, :, 0]
+sun_blue = sun_im[:, :, 2]
+sun_ratio = sun_blue/sun_red
+
+
+ax1 = plt.subplot(131)
+ax2 = plt.subplot(132, sharex=ax1, sharey=ax1)
+ax3 = plt.subplot(133, sharex=ax1, sharey=ax1)
+ax1.imshow(sun_red, cmap='Reds')
+ax2.imshow(sun_blue, cmap='Blues')
+ax3.imshow(sun_ratio)
+plt.suptitle('Soleil')
+plt.show()
+
+
+
+
+betelegeuse_im = np.array(Image.open("PHY-2006/Projet1/data/stars_pictures/betelgeuse4.tif"))
 bet_red = betelegeuse_im[:, :, 0]
 bet_blue = betelegeuse_im[:, :, 2]
 bet_ratio = bet_blue/bet_red
