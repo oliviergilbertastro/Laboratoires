@@ -139,10 +139,3 @@ ax2.set_xlabel("B/R ratio", fontsize=17)
 plt.show()
 
 print(ratio_fit)
-
-
-#Process the actual pictures
-if False:
-    betelegeuse_im = np.array(Image.open("PHY-2006/Projet1/data/stars_pictures/betelgeuse2.tif"))
-    plt.imshow(betelegeuse_im)
-    plt.show()

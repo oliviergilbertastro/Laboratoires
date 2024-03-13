@@ -72,7 +72,7 @@ kappa_list = []
 extinction_percentages = []
 for i in range(len(sun_wav)):
     kappa_list.append(polynomial(sun_wav[i], res[0], res[1], res[2], res[3], res[4]))
-    extinction_percentages.append(mag_to_percentage(kappa_list[i], observation_angle=40/180*np.pi))
+    extinction_percentages.append(mag_to_percentage(kappa_list[i], observation_angle=60/180*np.pi))
     sun_radiance[i] = correct_intensity(sun_radiance[i], extinction_percentages[i])
 
 ax1 = plt.subplot(122)
@@ -151,7 +151,7 @@ if True:
     plt.show()
 #temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav[1600:2500], sun_radiance[1600:2500], p0=[5500, 1E-13])[0]
 #temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav, sun_radiance, p0=[5500, 1E-13])[0]
-temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav[1300:2000], sun_radiance[1300:2000], p0=[5500, 1E-13])[0]
+temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav[700:3000], sun_radiance[700:3000], p0=[5500, 1E-13])[0]
 sed_fit = planckslaw_radiance(wav_sim, temp_experimentale, scale)
 print('*************FIT***************')
 print('T', temp_experimentale)
@@ -171,9 +171,9 @@ for label in ticklabels:
 #    ax1.plot(sun_wav_list[i], sun_energydensity_list[i], color='purple')
 ax1.plot(sun_wav, sun_radiance, label='Données corrigées')
 ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
-
-ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={round(temp_wien[0])}$K', linestyle='dotted')
-ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale)}$K', linestyle='dashed')
+ratio = np.max(sun_radiance)/np.max(sed_sim)/2
+ax1.plot(wav_sim, sed_sim*ratio, label=f'Corps noir de $T={round(temp_wien[0])}$K', linestyle='dotted')
+ax1.plot(wav_sim, sed_fit*ratio*sed_sim_scale/scale, label=f'Corps noir de $T={round(temp_experimentale)}$K', linestyle='dashed')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
 plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
 plt.legend(fontsize=14)
@@ -191,7 +191,7 @@ for label in ticklabels:
 #sun_radiance = sun_radiance/np.max(sun_radiance)
 #for i in range(len(sun_wav_list)):
 #    ax1.plot(sun_wav_list[i], sun_energydensity_list[i], color='purple')
-ax1.plot(wav_sim, planckslaw_radiance(wav_sim, 5778, 1), label=f'Théorique $T={5778}$K', linestyle='dotted')
+ax1.plot(wav_sim, planckslaw_radiance(wav_sim, 5778, 1), label=f'Théorique $T={5778}$K', linestyle='solid')
 ax1.plot(wav_sim, planckslaw_radiance(wav_sim, temp_wien, 1), label=f'Ajusté Wien $T={round(temp_wien[0])}$K', linestyle='dotted')
 ax1.plot(wav_sim, planckslaw_radiance(wav_sim, temp_experimentale, 1), label=f'Ajusté Planck $T={round(temp_experimentale)}$K', linestyle='dashed')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
