@@ -12,6 +12,7 @@ b = 2.897771955E-3 #m.K
 
 #Best-fitting coefficients are calculated in color_temperature.py from the ZWO ASI 224mc color manual and theoretical formulas
 coeffs = [-36756.02512371,285792.83399003,-819480.14776133,1208529.75689052,-884389.37032566,261133.76091327]
+#coeffs = [-39896.14023759,304804.31462193,-859100.21818706,1238474.56190981,-884015.77662941,254445.61448027]
 
 def temperature_from_BR(br):
     """
@@ -21,7 +22,7 @@ def temperature_from_BR(br):
     return c1+c2*br+c3*br**2+c4*br**3+c5*br**4+c6*br**5
 
 #Process the actual pictures
-sun_im = np.array(Image.open("PHY-2006/Projet1/data/stars_pictures/Sun_v5.png"))
+sun_im = np.array(Image.open("PHY-2006/Projet1/data/stars_pictures/Sun_v2.tiff"))
 sun_red = sun_im[:, :, 0]
 sun_blue = sun_im[:, :, 2]
 sun_ratio = sun_blue/sun_red
