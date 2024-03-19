@@ -30,17 +30,17 @@ def create__osci_plot(filename, name):
     #plt.suptitle(f'Oscilloscope avec impulsion de durée {name}', size=17)
     plt.ylabel(r'Tension [V]', size=17)
     plt.xlabel(r'Temps [s]', size=17)
-    plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5'+f"\oscilloscope_{name}.pdf", format="pdf", bbox_inches="tight")
+    #plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5'+f"\oscilloscope_{name}.pdf", format="pdf", bbox_inches="tight")
     plt.show()
 
     return True
 
 
 
-create__osci_plot("lab5/usb/scope_i5.csv", "5W")
-create__osci_plot("lab5/usb/scope_i6.csv", "W")
-create__osci_plot("lab5/usb/scope_i7.csv", "W (court-circuité)")
-create__osci_plot("lab5/usb/scope_i8.csv", "5W (court-circuité)")
+create__osci_plot("PHY-2002/lab5/usb/scope_i5.csv", "5W")
+create__osci_plot("PHY-2002/lab5/usb/scope_i6.csv", "W")
+create__osci_plot("PHY-2002/lab5/usb/scope_i7.csv", "W (court-circuité)")
+create__osci_plot("PHY-2002/lab5/usb/scope_i8.csv", "5W (court-circuité)")
 #create__osci_plot("lab5/usb/scope_g2.csv", "W (ajusté)")
 
 
@@ -52,8 +52,8 @@ tension_sansC = []
 tension_sansC_stdev = []
 
 for i in range(14):
-    res = np.array(get_values_from_file(f"lab5/SANS_C/resistance_{i}.lvm").iloc[:, 1])
-    ten = np.array(get_values_from_file(f"lab5/SANS_C/tension_efficace_{i}.lvm").iloc[:, 1])
+    res = np.array(get_values_from_file(f"PHY-2002/lab5/SANS_C/resistance_{i}.lvm").iloc[:, 1])
+    ten = np.array(get_values_from_file(f"PHY-2002/lab5/SANS_C/tension_efficace_{i}.lvm").iloc[:, 1])
 
     #On calcule la val. médianne et l'incertitude (stdev):
 
@@ -191,7 +191,7 @@ plt.legend()
 plt.xscale('log')
 plt.ylabel(r'P$_\mathrm{moy}$ [W]', size=17)
 plt.xlabel(r'Résistance [$\Omega$]', size=17)
-plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5\resistance_sansC.pdf', format="pdf", bbox_inches="tight")
+#plt.savefig(r'C:\Users\olivi\Desktop\Devoirs\PhysElectronique\figures\lab5\resistance_sansC.pdf', format="pdf", bbox_inches="tight")
 plt.show()
 
 sigma_1 = ((np.quantile(resistance_fit, 0.8415)-np.quantile(resistance_fit, 0.50))+(np.quantile(resistance_fit, 0.5)-np.quantile(resistance_fit, 0.1585)))/2
