@@ -9,6 +9,8 @@ def polynomial(x,a,b,c,d):
 x_data = [200, 400, 599, 600, 800]
 y_data = [140, 90, 41, 41, 203]
 res = curve_fit(polynomial, x_data, y_data)[0]
+sig = np.sqrt(np.diag(curve_fit(polynomial, x_data, y_data)[1]))
+print(sig)
 
 x_fit = np.linspace(200, 900, 1000)
 y_fit = polynomial(x_fit, res[0], res[1], res[2], res[3])

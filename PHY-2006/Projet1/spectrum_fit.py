@@ -9,7 +9,7 @@ c = 299792458 #m/s
 k_B = 1.380649E-23 #m^2.kg.s^-2.K^-1
 b = 2.897771955E-3 #m.K
 
-fiber_diameter = 600E-6 #m
+fiber_diameter = 150E-6 #m
 
 def smooth(x, smoothing_param=3):
     window_len=smoothing_param*2+1
@@ -27,7 +27,7 @@ def open_spectrum(filepath):
 
 def sensitivity(wav):
     '''Returns the photons/count for a wavelength'''
-    if False:
+    if True:
         return 4.37173854E-6*wav**3-5.23293797E-3*wav**2+1.66567753*wav-18.7919391
     return 86
 
@@ -86,12 +86,12 @@ for label in ticklabels:
 ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
 #ax1.plot(atm_wav, atm_counts, label=f'Atmosphère')
 ax1.set_xlabel('$\lambda$ [nm]', fontsize=17)
-ax1.set_ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
+ax1.set_ylabel("$\propto$ Radiance $\propto$[W/m$^2$/nm]", fontsize=17)
 ax1.legend(fontsize=14)
 ax2.plot(sun_wav, sun_counts, label='Données')
 #ax1.plot(atm_wav, atm_counts, label=f'Atmosphère')
 ax2.set_xlabel('$\lambda$ [nm]', fontsize=17)
-ax2.set_ylabel("Counts", fontsize=17)
+ax2.set_ylabel("# de détections", fontsize=17)
 ax2.legend(fontsize=14)
 plt.show()
 
@@ -152,6 +152,10 @@ if True:
 #temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav[1600:2500], sun_radiance[1600:2500], p0=[5500, 1E-13])[0]
 #temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav, sun_radiance, p0=[5500, 1E-13])[0]
 temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav[700:3000], sun_radiance[700:3000], p0=[5500, 1E-13])[0]
+temp_experimentale, scale = curve_fit(planckslaw_radiance, sun_wav[:2900], sun_radiance[:2900], p0=[5500, 1E-13])[0]
+cov_temp, cov_scale = curve_fit(planckslaw_radiance, sun_wav[:2900], sun_radiance[:2900], p0=[5500, 1E-13])[1]
+sig_temp = np.sqrt(np.diag(cov_temp))[0,0]
+print('Temp uncertainty', sig_temp)
 sed_fit = planckslaw_radiance(wav_sim, temp_experimentale, scale)
 print('*************FIT***************')
 print('T', temp_experimentale)
@@ -171,9 +175,9 @@ for label in ticklabels:
 #    ax1.plot(sun_wav_list[i], sun_energydensity_list[i], color='purple')
 ax1.plot(sun_wav, sun_radiance, label='Données corrigées')
 ax1.plot(sun_wav, sun_radiance_uncorr, label='Données')
-ratio = np.max(sun_radiance)/np.max(sed_sim)/2
-ax1.plot(wav_sim, sed_sim*ratio, label=f'Corps noir de $T={round(temp_wien[0])}$K', linestyle='dotted')
-ax1.plot(wav_sim, sed_fit*ratio*sed_sim_scale/scale, label=f'Corps noir de $T={round(temp_experimentale)}$K', linestyle='dashed')
+ratio = np.max(sun_radiance)/np.max(sed_sim)*1.2
+ax1.plot(wav_sim, sed_sim, label=f'Corps noir de $T={round(temp_wien[0])}$K', linestyle='dotted')
+ax1.plot(wav_sim, sed_fit, label=f'Corps noir de $T={round(temp_experimentale)}$K', linestyle='dashed')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
 plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
 plt.legend(fontsize=14)
@@ -191,10 +195,11 @@ for label in ticklabels:
 #sun_radiance = sun_radiance/np.max(sun_radiance)
 #for i in range(len(sun_wav_list)):
 #    ax1.plot(sun_wav_list[i], sun_energydensity_list[i], color='purple')
-ax1.plot(wav_sim, planckslaw_radiance(wav_sim, 5778, 1), label=f'Théorique $T={5778}$K', linestyle='solid')
-ax1.plot(wav_sim, planckslaw_radiance(wav_sim, temp_wien, 1), label=f'Ajusté Wien $T={round(temp_wien[0])}$K', linestyle='dotted')
-ax1.plot(wav_sim, planckslaw_radiance(wav_sim, temp_experimentale, 1), label=f'Ajusté Planck $T={round(temp_experimentale)}$K', linestyle='dashed')
+wav_sim = np.linspace(1, 2000, 1000)
+ax1.plot(wav_sim, planckslaw_radiance(wav_sim, 5778, 1)/np.sum(planckslaw_radiance(wav_sim, 5778, 1)), label=f'Théorique $T={5778}$K', linestyle='solid')
+ax1.plot(wav_sim, planckslaw_radiance(wav_sim, temp_wien, 1)/np.sum(planckslaw_radiance(wav_sim, temp_wien, 1)), label=f'Ajusté Wien $T={round(temp_wien[0])}$K', linestyle='dotted')
+ax1.plot(wav_sim, planckslaw_radiance(wav_sim, temp_experimentale, 1)/np.sum(planckslaw_radiance(wav_sim, temp_experimentale, 1)), label=f'Ajusté Planck $T={round(temp_experimentale)}$K', linestyle='dashed')
 plt.xlabel('$\lambda$ [nm]', fontsize=17)
-plt.ylabel("Radiance [W/m$^2$/nm]", fontsize=17)
+plt.ylabel("Densité de radiance [%/nm]", fontsize=17)
 plt.legend(fontsize=14)
 plt.show()
