@@ -15,9 +15,11 @@ path.append(Space(d=l1.f))
 path.append(l1) 
 path.append(Space(d=(l1.f*5)))
 
+print('FOV:', np.tan(sensor_width/l1.f)*2/(2*np.pi)*360)
 #transferMatrix method returns the transfer matrix between the focals, not between the lenses
 print(path.transferMatrix())
 print('IsImaging (i.e. B=0):', path.isImaging)
 print(path.fieldStop())
 print(path.fieldOfView())
 path.display()
+
