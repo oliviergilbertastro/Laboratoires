@@ -2,10 +2,10 @@ from raytracing import *
 
 
 l1 = Lens(f=20, diameter=50, label="Objectif")
-l2 = Lens(f=5, diameter=50, label="Oculaire")
+l2 = Lens(f=-5, diameter=50, label="Oculaire")
 
-def transfer_matrix(f1,f2):
-    return np.array([[-f1/f2, 0], [f1+f2, -f2/f1]])
+#def transfer_matrix(f1,f2):
+#    return np.array([[-f1/f2, 0], [f1+f2, -f2/f1]])
 
 
 path = ImagingPath()
