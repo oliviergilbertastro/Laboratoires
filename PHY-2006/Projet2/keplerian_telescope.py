@@ -16,7 +16,7 @@ path.append(Space(d=(l1.f+l2.f)))
 path.append(l2) 
 path.append(Space(d=l2.f))
 
-print(transfer_matrix(l1.f, l2.f))
+
 print(path.transferMatrix())
 print('IsImaging (i.e. B=0):', path.isImaging)
 path.display()
