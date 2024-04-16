@@ -73,8 +73,24 @@ ax3.imshow(rig_ratio)
 plt.suptitle('Rigel')
 plt.show()
 
-print(np.mean(bet_ratio[585:591,602:608]))
-print(np.mean(rig_ratio[534:542,657:667]))
+#Calculate stdev:
+bet_valid_pixels = []
+for i in bet_ratio.flatten():
+    if i>0 and i<1:
+        bet_valid_pixels.append(i)
+
+rig_valid_pixels = []
+for i in rig_ratio.flatten():
+    if i>0 and i<1:
+        rig_valid_pixels.append(i)
+
+print('Betelgeuse:', np.std(bet_valid_pixels))
+print('Rigel:',np.std(rig_valid_pixels))
+
+print(np.mean(bet_valid_pixels))
+print(np.mean(rig_valid_pixels))
 
 print("Betelgeuse temperature:", temperature_from_BR(0.483), 'K')
+print(f"Betelgeuse uncertainty: +/-{(temperature_from_BR(0.483+np.std(bet_valid_pixels))-temperature_from_BR(0.483)+temperature_from_BR(0.483)-temperature_from_BR(0.483-np.std(bet_valid_pixels)))/2}")
 print("Rigel temperature:", temperature_from_BR(0.88), 'K')
+print(f"Rigel uncertainty: +/-{(temperature_from_BR(0.88+np.std(rig_valid_pixels))-temperature_from_BR(0.88)+temperature_from_BR(0.88)-temperature_from_BR(0.88-np.std(rig_valid_pixels)))/2}")
