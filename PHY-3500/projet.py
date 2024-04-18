@@ -8,6 +8,27 @@ y = [0, .06, .17, .19, .21, .26, .28, .29, .30, .31, .32]
 
 
 
+class SplinePiecewise():
+    def __init__(self, a, b, c, d, exes):
+        self.a =  a
+        self.b = b
+        self.c = c
+        self.d = d
+        self.exes = exes
+        pass
+
+    def polynomial_3(self, x, a, b, c, d):
+        return a*x**3+b*x**2+c*x+d
+
+    def __call__(self, x):
+        i = 0
+        if x < self.exes[0]:
+            return self.line(x, self.a[0], self.b[0])
+        while self.exes[i] <= x and i < len(self.a):
+            i += 1
+        return self.line(x, self.a[i-1], self.b[i-1])
+
+
 def cubic_spline_interpolation(x, y):
     """
     x: array-like of N values
@@ -29,17 +50,21 @@ def cubic_spline_interpolation(x, y):
     #q[i] = (1-t)*y[i-1]+t*y[i]+t*(1-t)*((1-t)*a[i]+t*b[i])
 
     #We'll try to find the coefficients using *linear algebra*
-    X_vec = np.array(x)
-    Y_vec = np.array(y)
-    coeffs_matrix = np.zeros((4,N))
+    A = np.zeros((4*(N-1),4*(N-1)))
+    B = np.zeros((4*(N-1),))
 
     for i in range(N-1):
-        c1 = x[i+1]-x[i]
-        c2 = y[i+1]-y[i]
-        #a[i+1] = k[i]*c1-c2
-        #b[i+1] = -k[i]*c1+c2
+        pass
 
     pass
+
+
+
+
+
+
+
+
 
 class LinearPiecewise():
     def __init__(self, a, b, exes):

@@ -17,4 +17,6 @@ wav, spectra_cube = open_spectra(fig=8, Z=0.001)
 for i in range(30):
     plt.plot(wav, spectra_cube[:, i])
 plt.xlim((-1000, 12000))
+plt.xlabel("$\AA$")
+plt.ylabel("$\log$(Flux) [erg/s/$\AA$]")
 plt.show()
