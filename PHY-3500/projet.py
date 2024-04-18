@@ -54,6 +54,7 @@ def cubic_spline_interpolation(x, y):
     B = np.zeros((4*(N-1),))
 
     for i in range(N-1):
+        B[i] = 0
         pass
 
     pass
