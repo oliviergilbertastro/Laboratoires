@@ -33,7 +33,7 @@ def open_photon(fig, Z=0.001):
         nb_photons.append(np.array(linedata[1:], float))
     return time, 10**np.array(nb_photons)
 
-time, photons = open_photon(fig=77, Z=0.001)
+time, photons = open_photon(fig=77, Z=0.040)
 for i in range(2):
     plt.plot(time, photons[:, i])
 plt.xlabel("Temps [années]")
