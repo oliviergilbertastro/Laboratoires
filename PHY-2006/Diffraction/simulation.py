@@ -62,16 +62,16 @@ class Diffraction():
         plt.suptitle(f'$\lambda$={self.lambda1*1E9}nm, DIA={self.ouverture*1000}mm, '+ r'D$_\mathrm{écran}$'+f'={self.distance_to_screen*100}cm, résolution=({self.res}x{self.res})', size=18)
         plt.show()
 
-#res=1000-10000 est le meilleur qualité/prix
+#res=1000-10000 est le meilleur rapport qualité/prix
 image = Diffraction(
-                    taille=0.01, #environ 10cm
+                    taille=0.01, #en mètres
                     res=2000,
                     lambda1=650E-9, #laser de 650nm
                     noise_level=0,
                     noise_deviation=0.01,
                     amplitude=1,
-                    distance_to_screen=0.255,
-                    ouverture=0.0002
+                    distance_to_screen=0.255, #en mètres
+                    ouverture=2E-4 #en mètres
                     )
 image.show()
 
