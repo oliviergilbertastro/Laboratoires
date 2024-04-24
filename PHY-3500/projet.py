@@ -1,9 +1,8 @@
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
+from scipy.interpolate import make_interp_spline
 
-x = [0, .1, .499, .5, .6, 1.0, 1.4, 1.5, 1.899, 1.9, 2.0]
-y = [0, .06, .17, .19, .21, .26, .28, .29, .30, .31, .32]
 
 red_data = np.loadtxt('PHY-2006/Projet1/data/stars_pictures/red_QE_curve.csv', skiprows=1, delimiter=',')
 red_data = red_data[red_data[:, 0].argsort()]
@@ -139,34 +138,64 @@ def linear_interpolation(x, y):
         b.append(y[i]-a[-1]*x[i])
     return LinearPiecewise(a, b, x)
 
+if False:
+    if True:
+        redSpline = cubic_spline_interpolation(red_x, red_y)
+        blueSpline = cubic_spline_interpolation(blue_x, blue_y)
+        greenSpline = cubic_spline_interpolation(green_x, green_y)
+    else:
+        redSpline = linear_interpolation(red_x, red_y)
+        blueSpline = linear_interpolation(blue_x, blue_y)
+        greenSpline = linear_interpolation(green_x, green_y)
+    #spline = sp.interpolate.CubicSpline(red_x, red_y)
+    x_range = np.linspace(red_x[0], red_x[-1], 10000)
+    red_line = []
+    blue_line = []
+    green_line = []
+    for i in range(len(x_range)):
+        red_line.append(redSpline(x_range[i]))
+        blue_line.append(blueSpline(x_range[i]))
+        green_line.append(greenSpline(x_range[i]))
+    #plt.plot(red_x, red_y, 'o')
+    #plt.plot(x_range, spline(x_range), linewidth=3, label='SciPy')
+    ax1 = plt.subplot(111)
+    ticklabels = ax1.get_xticklabels()
+    ticklabels.extend( ax1.get_yticklabels() )
+    for label in ticklabels:
+        label.set_fontsize(14)
+    plt.plot(x_range, red_line, label='Nous', color='red')
+    plt.plot(x_range, blue_line, label='Nous', color='blue')
+    plt.plot(x_range, green_line, label='Nous', color='green')
+    #plt.legend()
+    plt.xlabel("Wavelength $\lambda$ [nm]", fontsize=15)
+    plt.ylabel("Relative response [%]", fontsize=15)
+    plt.show()
+
+
+
+
+
+
+
 if True:
-    redSpline = cubic_spline_interpolation(red_x, red_y)
-    blueSpline = cubic_spline_interpolation(blue_x, blue_y)
-    greenSpline = cubic_spline_interpolation(green_x, green_y)
-else:
-    redSpline = linear_interpolation(red_x, red_y)
-    blueSpline = linear_interpolation(blue_x, blue_y)
-    greenSpline = linear_interpolation(green_x, green_y)
-#spline = sp.interpolate.CubicSpline(red_x, red_y)
-x_range = np.linspace(red_x[0], red_x[-1], 10000)
-red_line = []
-blue_line = []
-green_line = []
-for i in range(len(x_range)):
-    red_line.append(redSpline(x_range[i]))
-    blue_line.append(blueSpline(x_range[i]))
-    green_line.append(greenSpline(x_range[i]))
-#plt.plot(red_x, red_y, 'o')
-#plt.plot(x_range, spline(x_range), linewidth=3, label='SciPy')
-ax1 = plt.subplot(111)
-ticklabels = ax1.get_xticklabels()
-ticklabels.extend( ax1.get_yticklabels() )
-for label in ticklabels:
-    label.set_fontsize(14)
-plt.plot(x_range, red_line, label='Nous', color='red')
-plt.plot(x_range, blue_line, label='Nous', color='blue')
-plt.plot(x_range, green_line, label='Nous', color='green')
-#plt.legend()
-plt.xlabel("Wavelength $\lambda$ [nm]", fontsize=15)
-plt.ylabel("Relative response [%]", fontsize=15)
-plt.show()
+    x = [0, .1, .499, .5, .6, 1.0, 1.4, 1.5, 1.899, 1.9, 2.0]
+    y = [0, .06, .17, .19, .21, .26, .28, .29, .30, .31, .32]
+
+    x_range = np.linspace(x[0], x[-1], 1000)
+
+    mySpline = cubic_spline_interpolation(x, y)
+    spSpline = make_interp_spline(x,y, k=3)
+    print(spSpline.t)
+    ax1 = plt.subplot(111)
+    ticklabels = ax1.get_xticklabels()
+    ticklabels.extend( ax1.get_yticklabels() )
+    for label in ticklabels:
+        label.set_fontsize(14)
+    mySpline_y = []
+    for i in range(len(x_range)):
+        mySpline_y.append(mySpline(x_range[i]))
+    plt.plot(x, y, 'o')
+    #plt.plot(x_range, mySpline_y, label='Nous')
+    plt.plot(x_range, spSpline(x_range), label='SciPy')
+    plt.legend()
+    plt.show()
