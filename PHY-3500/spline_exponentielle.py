@@ -24,66 +24,6 @@ class ExponentialSplinePiecewise():
             i += 1
         return self.exponential(x, self.a[i-1], self.b[i-1], self.c[i-1], self.d[i-1], self.exes[i-1], self.p[i-1])
 
-
-
-
-def exponential_spline_interpolation_initial_tension(x, y, tension=0):
-    """
-    x: array-like of N values
-    y: array-like of N values
-
-    We will have (N-1) segments of exponential functions, which means we'll have 4(N-1) coefficients to store
-
-    returns a Spline object which is a piecewise function (e.g. Spline(x)=y)
-
-    **THIS FUNCTION IS NOT MEANT TO BE CALLED DIRECTLY, IT IS CALLED BY exponential_spline_interpolation()**
-    """
-    #Check if x and y are the same length:
-    if len(x) != len(y):
-        raise IndexError("x and y are not the same size")
-    N = len(x)
-    for i in range(1,N):
-        if x[i-1] > x[i]:
-            raise ValueError("x is not increasing")
-    p = np.ones((N,))*tension
-    #We will have N-1 piecewise functions:
-    #S[i] = a[i]*x**3+b[i]*x**2+c[i]*x+d[i]
-
-    #We'll try to find the coefficients using *linear algebra*
-    A = np.zeros((4*(N-1),4*(N-1)))
-    B = np.zeros((4*(N-1),))
-
-    for i in range(N-1):
-        B[i] = y[i]
-        A[i,4*i:4*(i+1)] = [1, x[i], np.exp(p[i]*x[i]), np.exp(-p[i]*x[i])]
-    for i in range(N-1):
-        B[N-1+i] = y[i+1]
-        A[N-1+i,4*i:4*(i+1)] = [1, x[i+1], np.exp(p[i+1]*x[i+1]), np.exp(-p[i+1]*x[i+1])]
-    for i in range(N-2):
-        B[2*(N-1)+i] = 0
-        A[2*(N-1)+i, 4*i:4*(i+2)] = [0, 1, p[i]*np.exp(p[i]*x[i+1]), -p[i]*np.exp(-p[i]*x[i+1]), 0, -1, -p[i+1]*np.exp(p[i+1]*x[i+1]), p[i+1]*np.exp(-p[i+1]*x[i+1])]
-    for i in range(N-2):
-        B[2*(N-1)+N-2+i] = 0
-        A[2*(N-1)+N-2+i, 4*i:4*(i+2)] = [0, 0, p[i]**2*np.exp(p[i]*x[i+1]), p[i]**2*np.exp(-p[i]*x[i+1]), 0, 0, -p[i+1]**2*np.exp(p[i+1]*x[i+1]), -p[i+1]**2*np.exp(-p[i+1]*x[i+1])]
-    #Conditions frontières
-    B[-2:] = 0
-    A[-2, :4] = [0, 0, p[0]**2*np.exp(p[0]*x[0]), p[0]**2*np.exp(-p[0]*x[0])]
-    A[-1, -4:] = [0, 0, p[-1]**2*np.exp(p[-1]*x[-1]), p[0]**2*np.exp(-p[-1]*x[-1])]
-
-    #Calculate the coefficient matrix
-    X = np.linalg.solve(A, B)
-    a = []
-    b = []
-    c = []
-    d = []
-    for i in range(int(len(X)/4)):
-        a.append(X[i*4])
-        b.append(X[i*4+1])
-        c.append(X[i*4+2])
-        d.append(X[i*4+3])
-
-    return ExponentialSplinePiecewise(a, b, c, d, x, p)
-
 def exponential_spline_interpolation_initial_tension(x, y, tension):
     """
     x: array-like of N values
@@ -210,7 +150,7 @@ if True:
     plt.legend(fontsize=11, loc='lower right')
     plt.show()
 
-if False:
+if True:
     x = [0.0, 1.0, 1.5, 2.5, 4.0, 4.5, 5.5, 6.0, 8.0, 10.0]
     y = [10, 8, 5, 4, 3.5, 3.4, 6, 7.1, 8, 8.5]
 
@@ -235,7 +175,7 @@ if False:
     plt.legend()
     plt.show()
 
-if False:
+if True:
     x = np.linspace(0, 4*np.pi, 30)
     def func(x):
         return np.sin(x)+np.exp(-x/2)
@@ -263,7 +203,7 @@ if False:
     plt.legend(fontsize=11, loc='upper left')
     plt.show()
 
-if False:
+if True:
     x = [0, 1, 2, 3, 4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6, 7, 8, 9, 10]
     def func(x):
         if x > 4 and x < 6:
