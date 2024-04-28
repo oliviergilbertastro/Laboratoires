@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sp
-from projet import cubic_spline_interpolation, CubicSplinePiecewise
+from spline_lineare_cubique import cubic_spline_interpolation, CubicSplinePiecewise
 
 class ExponentialSplinePiecewise():
     def __init__(self, a, b, c, d, exes, p):
