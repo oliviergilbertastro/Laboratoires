@@ -146,7 +146,7 @@ if True:
         for i in range(len(x_range)):
             expSpline_y.append(expSpline(x_range[i]))
         plt.plot(x_range, expSpline_y, linewidth=2, label=f'p={k}')
-    plt.plot(x, y, 'o', color='red')
+    plt.plot(x, y, 'o', color='black', label='Données')
     plt.legend(fontsize=11, loc='lower right')
     plt.show()
 
