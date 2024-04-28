@@ -213,13 +213,8 @@ if True:
     plt.legend()
     plt.show()
 
-if False:
-    x = [0, 1, 2, 3, 4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6, 7, 8, 9, 10]
+if True:
     x = np.linspace(0, 4*np.pi, 30)
-    def func(x):
-        if x > 4 and x < 6:
-            return np.cos((x-5)*(np.pi/2))
-        return 0
     def func(x):
         return np.sin(x)+np.exp(-x/2)
     y = []
@@ -241,6 +236,40 @@ if False:
         expSpline_y.append(expSpline(x_range[i]))
         cubicSpline_y.append(cubicSpline(x_range[i]))
     plt.plot(x, y, 'o', color='red')
+    plt.plot(x_range, cubicSpline_y, linewidth=2, label='Spline Cubique', color='orange')
+    plt.plot(x_range, expSpline_y, linewidth=2, label='Spline Exponentielle', color='blue')
+    plt.legend(fontsize=11, loc='upper left')
+    plt.show()
+
+
+if True:
+    x = [0, 1, 2, 3, 4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6, 7, 8, 9, 10]
+    def func(x):
+        if x > 4 and x < 6:
+            return np.cos((x-5)*(np.pi/2))
+        return 0
+    y = []
+    for i in range(len(x)):
+        y.append(func(x[i]))
+
+    x_range = np.linspace(x[0], x[-1], 1000)
+    y_range = []
+    expSpline = exponential_spline_interpolation(x, y)
+    cubicSpline = cubic_spline_interpolation(x, y)
+
+    ax1 = plt.subplot(111)
+    ticklabels = ax1.get_xticklabels()
+    ticklabels.extend( ax1.get_yticklabels() )
+    for label in ticklabels:
+        label.set_fontsize(14)
+    expSpline_y = []
+    cubicSpline_y = []
+    for i in range(len(x_range)):
+        expSpline_y.append(expSpline(x_range[i]))
+        cubicSpline_y.append(cubicSpline(x_range[i]))
+        y_range.append(func(x_range[i]))
+    plt.plot(x, y, 'o', color='red')
+    plt.plot(x_range, y_range, label='f(x)', color='green')
     plt.plot(x_range, cubicSpline_y, linewidth=2, label='Spline Cubique', color='orange')
     plt.plot(x_range, expSpline_y, linewidth=2, label='Spline Exponentielle', color='blue')
     plt.legend(fontsize=11, loc='upper left')
