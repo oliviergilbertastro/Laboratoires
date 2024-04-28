@@ -142,7 +142,7 @@ def exponential_spline_interpolation_initial_tension(x, y, tension):
     return ExponentialSplinePiecewise(a, b, c, d, x, p)
 
 
-def exponential_spline_interpolation(x, y):
+def exponential_spline_interpolation(x, y, p='None'):
     #Check if x and y are the same length:
     if len(x) != len(y):
         raise IndexError("x and y are not the same size")
@@ -172,23 +172,45 @@ def exponential_spline_interpolation(x, y):
         if undesirable_inflexion[i] == 1:
             tension.append(int(np.abs(ds[i]/(x[i+1]-x[i]))))
         else:
-            if i != 0 and i != (len(undesirable_inflexion)-1):
-                if undesirable_inflexion[i-1] == 1:
-                    tension.append(int(np.abs(ds[i-1]/(x[i+1]-x[i]))))
-                elif undesirable_inflexion[i+1] == 1:
-                    tension.append(int(np.abs(ds[i+1]/(x[i+1]-x[i]))))
-                else:
-                    tension.append(1)
-            else:
-                tension.append(0)
+            tension.append(0)
 
     input_vector = np.ones(N,)*np.max(tension)
     if np.max(tension) > 30:
+        #Even if the function is really weird, we don't want to make a linear-piecewise
         input_vector = np.ones(N,)*30
+    #If user chose a specific exponent
+    if p != "None":
+        if p == 0:
+            return cubic
+        return exponential_spline_interpolation_initial_tension(x,y,tension=np.ones(N,)*int(p))
+    if np.max(tension) == 0:
+        return cubic
     return exponential_spline_interpolation_initial_tension(x,y,tension=input_vector)
 
 
 if True:
+    x = [0, .1, .499, .5, .6, 1.0, 1.4, 1.5, 1.899, 1.9, 2.0]
+    y = [0, .06, .17, .19, .21, .26, .28, .29, .30, .31, .32]
+    x_range = np.linspace(x[0], x[-1], 1000)
+    
+
+    ax1 = plt.subplot(111)
+    ticklabels = ax1.get_xticklabels()
+    ticklabels.extend( ax1.get_yticklabels() )
+    for label in ticklabels:
+        label.set_fontsize(14)
+    tension_list = [0, 5, 10, 50, 100, 300]
+    for k in tension_list:
+        expSpline = exponential_spline_interpolation(x, y, p=k)
+        expSpline_y = []
+        for i in range(len(x_range)):
+            expSpline_y.append(expSpline(x_range[i]))
+        plt.plot(x_range, expSpline_y, linewidth=2, label=f'p={k}')
+    plt.plot(x, y, 'o', color='red')
+    plt.legend(fontsize=11, loc='lower right')
+    plt.show()
+
+if False:
     x = [0.0, 1.0, 1.5, 2.5, 4.0, 4.5, 5.5, 6.0, 8.0, 10.0]
     y = [10, 8, 5, 4, 3.5, 3.4, 6, 7.1, 8, 8.5]
 
@@ -213,7 +235,7 @@ if True:
     plt.legend()
     plt.show()
 
-if True:
+if False:
     x = np.linspace(0, 4*np.pi, 30)
     def func(x):
         return np.sin(x)+np.exp(-x/2)
@@ -241,8 +263,7 @@ if True:
     plt.legend(fontsize=11, loc='upper left')
     plt.show()
 
-
-if True:
+if False:
     x = [0, 1, 2, 3, 4, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6, 7, 8, 9, 10]
     def func(x):
         if x > 4 and x < 6:
