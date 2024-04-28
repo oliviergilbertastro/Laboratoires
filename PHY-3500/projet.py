@@ -1,25 +1,9 @@
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
-from scipy.interpolate import make_interp_spline
+from scipy.interpolate import make_interp_spline, CubicSpline
 
-
-red_data = np.loadtxt('PHY-2006/Projet1/data/stars_pictures/red_QE_curve.csv', skiprows=1, delimiter=',')
-red_data = red_data[red_data[:, 0].argsort()]
-red_x = red_data[:,0]
-red_y = red_data[:,1]
-
-blue_data = np.loadtxt('PHY-2006/Projet1/data/stars_pictures/blue_QE_curve.csv', skiprows=1, delimiter=',')
-blue_data = blue_data[blue_data[:, 0].argsort()]
-blue_x = blue_data[:,0]
-blue_y = blue_data[:,1]
-
-green_data = np.loadtxt('PHY-2006/Projet1/data/stars_pictures/green_QE_curve.csv', skiprows=1, delimiter=',')
-green_data = green_data[green_data[:, 0].argsort()]
-green_x = green_data[:,0]
-green_y = green_data[:,1]
-
-class SplinePiecewise():
+class CubicSplinePiecewise():
     def __init__(self, a, b, c, d, exes):
         self.a =  a
         self.b = b
@@ -93,7 +77,7 @@ def cubic_spline_interpolation(x, y):
         c.append(X[i*4+2])
         d.append(X[i*4+3])
 
-    return SplinePiecewise(a, b, c, d, x)
+    return CubicSplinePiecewise(a, b, c, d, x)
 
 
 
@@ -138,64 +122,71 @@ def linear_interpolation(x, y):
         b.append(y[i]-a[-1]*x[i])
     return LinearPiecewise(a, b, x)
 
-if False:
-    if True:
-        redSpline = cubic_spline_interpolation(red_x, red_y)
-        blueSpline = cubic_spline_interpolation(blue_x, blue_y)
-        greenSpline = cubic_spline_interpolation(green_x, green_y)
-    else:
-        redSpline = linear_interpolation(red_x, red_y)
-        blueSpline = linear_interpolation(blue_x, blue_y)
-        greenSpline = linear_interpolation(green_x, green_y)
-    #spline = sp.interpolate.CubicSpline(red_x, red_y)
-    x_range = np.linspace(red_x[0], red_x[-1], 10000)
-    red_line = []
-    blue_line = []
-    green_line = []
-    for i in range(len(x_range)):
-        red_line.append(redSpline(x_range[i]))
-        blue_line.append(blueSpline(x_range[i]))
-        green_line.append(greenSpline(x_range[i]))
-    #plt.plot(red_x, red_y, 'o')
-    #plt.plot(x_range, spline(x_range), linewidth=3, label='SciPy')
-    ax1 = plt.subplot(111)
-    ticklabels = ax1.get_xticklabels()
-    ticklabels.extend( ax1.get_yticklabels() )
-    for label in ticklabels:
-        label.set_fontsize(14)
-    plt.plot(x_range, red_line, label='Nous', color='red')
-    plt.plot(x_range, blue_line, label='Nous', color='blue')
-    plt.plot(x_range, green_line, label='Nous', color='green')
-    #plt.legend()
-    plt.xlabel("Wavelength $\lambda$ [nm]", fontsize=15)
-    plt.ylabel("Relative response [%]", fontsize=15)
-    plt.show()
 
 
 
 
 
+if __name__ == "__main__":
+    if input('Comparer spline cubique? [y/n]') == 'y':
+        #x = [0, .1, .499, .5, .6, 1.0, 1.4, 1.5, 1.899, 1.9, 2.0]
+        #y = [0, .06, .17, .19, .21, .26, .28, .29, .30, .31, .32]
+        x = [0.0, 1.0, 1.5, 2.5, 4.0, 4.5, 5.5, 6.0, 8.0, 10.0]
+        y = [10, 8, 5, 4, 3.5, 3.4, 6, 7.1, 8, 8.5]
 
+        x_range = np.linspace(x[0], x[-1], 1000)
 
-if True:
-    x = [0, .1, .499, .5, .6, 1.0, 1.4, 1.5, 1.899, 1.9, 2.0]
-    y = [0, .06, .17, .19, .21, .26, .28, .29, .30, .31, .32]
+        mySpline = cubic_spline_interpolation(x, y)
+        spSpline = CubicSpline(x,y, bc_type='natural') #Mêmes conditions frontières que nous (2e dérivées = 0 aux bouts)
+        ax1 = plt.subplot(111)
+        ticklabels = ax1.get_xticklabels()
+        ticklabels.extend( ax1.get_yticklabels() )
+        for label in ticklabels:
+            label.set_fontsize(14)
+        mySpline_y = []
+        for i in range(len(x_range)):
+            mySpline_y.append(mySpline(x_range[i]))
+        plt.plot(x, y, 'o', color='red')
+        plt.plot(x_range, mySpline_y, linewidth=2, label='Nous', color='blue')
+        plt.plot(x_range, spSpline(x_range), linewidth=3, linestyle='dashed', label='SciPy', color='black')
+        plt.legend()
+        plt.show()
 
-    x_range = np.linspace(x[0], x[-1], 1000)
+    if input('Comparer spline avec polynome? [y/n]') == 'y':
+        #x = [0, .1, .499, .5, .6, 1.0, 1.4, 1.5, 1.899, 1.9, 2.0]
+        #y = [0, .06, .17, .19, .21, .26, .28, .29, .30, .31, .32]
+        x = [0.0, 1.0, 1.5, 2.5, 4.0, 4.5, 5.5, 6.0, 8.0, 10.0]
+        y = [10, 8, 5, 4, 3.5, 3.4, 6, 7.1, 8, 8.5]
+        
+        x = np.linspace(-1, 1, 30)
+        y = []
+        def func(x):
+            return 1/(1+25*x**2)
+        for i in range(len(x)):
+            y.append(func(x[i]))
 
-    mySpline = cubic_spline_interpolation(x, y)
-    spSpline = make_interp_spline(x,y, k=3)
-    print(spSpline.t)
-    ax1 = plt.subplot(111)
-    ticklabels = ax1.get_xticklabels()
-    ticklabels.extend( ax1.get_yticklabels() )
-    for label in ticklabels:
-        label.set_fontsize(14)
-    mySpline_y = []
-    for i in range(len(x_range)):
-        mySpline_y.append(mySpline(x_range[i]))
-    plt.plot(x, y, 'o')
-    #plt.plot(x_range, mySpline_y, label='Nous')
-    plt.plot(x_range, spSpline(x_range), label='SciPy')
-    plt.legend()
-    plt.show()
+        x_range = np.linspace(x[0], x[-1], 1000)
+        y_range = []
+        for i in range(len(x_range)):
+            y_range.append(func(x_range[i]))
+        mySpline = cubic_spline_interpolation(x, y)
+        
+        ax1 = plt.subplot(111)
+        ticklabels = ax1.get_xticklabels()
+        ticklabels.extend( ax1.get_yticklabels() )
+        for label in ticklabels:
+            label.set_fontsize(14)
+        mySpline_y = []
+        for i in range(len(x_range)):
+            mySpline_y.append(mySpline(x_range[i]))
+        #plt.plot(x, y, 'o', color='red')
+        plt.plot(x_range, y_range, label='$f(x)$', linewidth=2, color='black')
+        #plt.plot(x_range, mySpline_y, linewidth=2, label='Spline Cubique', color='blue')
+        for i in range(2):
+            polynomial = np.polyfit(x,y, deg=5+i*4) #Mêmes conditions frontières que nous (2e dérivées = 0 aux bouts)
+            plt.plot(x_range, np.polyval(polynomial, x_range), linewidth=2, linestyle='dashed', label=f'Polynôme deg {5+4*i}', color=["blue","red"][i])
+        plt.xlabel(r"$x$", fontsize=15)
+        plt.ylabel(r"$f(x)$", fontsize=15)
+        plt.title(r"$f(x)=\left(1+25x^2\right)^{-1}$", fontsize=15)
+        plt.legend()
+        plt.show()
