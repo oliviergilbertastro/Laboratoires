@@ -72,7 +72,7 @@ if input("Photons counts? [y/n]") == "y":
     ticklabels.extend( ax1.get_yticklabels() )
     for label in ticklabels:
         label.set_fontsize(14)
-    imf = 1
+    imf = 0
     plt.title(r"$\alpha=$"+['2.35','3.30'][imf], fontsize=15)
     plt.plot(time_z0001, photons_z0001[:, imf], label=r"$z=0.001$")
     plt.plot(time_z0004, photons_z0004[:, imf], label=r"$z=0.004$")
@@ -114,7 +114,7 @@ if input("E-Width? [y/n]") == "y":
     ticklabels.extend( ax1.get_yticklabels() )
     for label in ticklabels:
         label.set_fontsize(14)
-    imf = 1
+    imf = 0
     plt.title(r"$\alpha=$"+['2.35','3.30'][imf], fontsize=15)
     plt.plot(time_z0001, ewidth_z0001[:, imf], label=r"$z=0.001$")
     plt.plot(time_z0004, ewidth_z0004[:, imf], label=r"$z=0.004$")
