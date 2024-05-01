@@ -133,6 +133,9 @@ if __name__ == "__main__":
         #y = [0, .06, .17, .19, .21, .26, .28, .29, .30, .31, .32]
         x = [0.0, 1.0, 1.5, 2.5, 4.0, 4.5, 5.5, 6.0, 8.0, 10.0]
         y = [10, 8, 5, 4, 3.5, 3.4, 6, 7.1, 8, 8.5]
+        
+        x = [0, 1, 3, 5]
+        y = [0, 6, 5, 1]
 
         x_range = np.linspace(x[0], x[-1], 1000)
 
@@ -147,10 +150,57 @@ if __name__ == "__main__":
         for i in range(len(x_range)):
             mySpline_y.append(mySpline(x_range[i]))
         plt.plot(x, y, 'o', color='red')
-        plt.plot(x_range, mySpline_y, linewidth=2, label='Nous', color='blue')
-        plt.plot(x_range, spSpline(x_range), linewidth=3, linestyle='dashed', label='SciPy', color='black')
-        plt.legend()
+        #plt.plot(x_range, mySpline_y, linewidth=2, label='Nous', color='blue')
+        #plt.plot(x_range, spSpline(x_range), linewidth=3, linestyle='dashed', label='SciPy', color='black')
+        #plt.legend()
         plt.show()
+
+if __name__ == "__main__":
+    if input('Powerpoint? [y/n]') == 'y':
+        x = [0.0, 1.0, 1.5, 2.5, 4.0, 4.5, 5.5, 6.0, 8.0, 10.0]
+        y = [10, 8, 5, 4, 3.5, 3.4, 6, 7.1, 8, 8.5]
+        
+        x = [0, 1, 3, 5]
+        y = [0, 6, 5, 1]
+
+        x_range = np.linspace(x[0], x[-1], 1000)
+
+        mySpline = cubic_spline_interpolation(x, y)
+        polynoms_y = []
+        for k in range(len(x)-1):
+            polynoms_y.append([])
+            for i in x_range:
+                polynoms_y[k].append(mySpline.polynomial_3(i, mySpline.a[k], mySpline.b[k], mySpline.c[k], mySpline.d[k]))
+        for ik in range(len(polynoms_y)):
+            ax1 = plt.subplot(111)
+            ticklabels = ax1.get_xticklabels()
+            ticklabels.extend( ax1.get_yticklabels() )
+            for label in ticklabels:
+                label.set_fontsize(14)
+            mySpline_y = []
+            for i in range(len(x_range)):
+                mySpline_y.append(mySpline(x_range[i]))
+            #plt.plot(x_range, mySpline_y, linewidth=2, label='Nous', color='blue')
+            
+            plt.plot(x_range, polynoms_y[ik], linestyle='dashed', linewidth=2)
+            plt.plot(x, y, 'o', color='red')
+            plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     if input('Comparer spline avec polynome? [y/n]') == 'y':
         #x = [0, .1, .499, .5, .6, 1.0, 1.4, 1.5, 1.899, 1.9, 2.0]
