@@ -1,5 +1,12 @@
 import numpy as np
 from tqdm import tqdm
+import os
+import sys
+import parse
+code_cours = os.path.dirname(os.path.realpath(__file__))[-4:]
+parent_dir = parse.parse("{}\PHY-"+code_cours, os.path.dirname(os.path.realpath(__file__)))[0]
+sys.path.append(parent_dir)
+from utils import *
 
 def num7(N_rolls=1000, nb_of_dice=3, if_plot=True):
     totals = []
@@ -20,4 +27,5 @@ def num7(N_rolls=1000, nb_of_dice=3, if_plot=True):
     return totals
 
 if __name__ == "__main__":
+    print_color("****************************Numéro D1.7**********************************")
     num7(N_rolls=1000000)
