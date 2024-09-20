@@ -8,6 +8,16 @@ parent_dir = parse.parse("{}\PHY-"+code_cours, os.path.dirname(os.path.realpath(
 sys.path.append(parent_dir)
 from utils import *
 
+def num1():
+    prob = 1
+    for i in range(1,26):
+        print(i)
+        prob *= (365-i)/365 # prob de ne pas partager la fête avec quelqu'un
+    print(prob)
+    prob = 1-prob
+    print(prob)
+    pass
+
 def num7(N_rolls=1000, nb_of_dice=3, if_plot=True):
     totals = []
     for i in tqdm(range(N_rolls)):
@@ -27,5 +37,7 @@ def num7(N_rolls=1000, nb_of_dice=3, if_plot=True):
     return totals
 
 if __name__ == "__main__":
+    print_color("****************************Numéro D1.1**********************************")
+    num1()
     print_color("****************************Numéro D1.7**********************************")
     num7(N_rolls=1000000)
