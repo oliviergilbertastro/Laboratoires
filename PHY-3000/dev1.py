@@ -10,8 +10,7 @@ from utils import *
 
 def num1():
     prob = 1
-    for i in range(1,26):
-        print(i)
+    for i in range(1,11):
         prob *= (365-i)/365 # prob de ne pas partager la fête avec quelqu'un
     print(prob)
     prob = 1-prob
