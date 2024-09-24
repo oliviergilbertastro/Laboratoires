@@ -3,9 +3,11 @@ from tqdm import tqdm
 import os
 import sys
 import parse
-code_cours = os.path.dirname(os.path.realpath(__file__))[-4:]
-parent_dir = parse.parse("{}\PHY-"+code_cours, os.path.dirname(os.path.realpath(__file__)))[0]
-sys.path.append(parent_dir)
+#code_cours = os.path.dirname(os.path.realpath(__file__))[-4:]
+#parent_dir = parse.parse("{}\PHY-"+code_cours, os.path.dirname(os.path.realpath(__file__)))[0]
+#sys.path.append(parent_dir)
+
+sys.path.append(parse.parse("{}\PHY-"+os.path.dirname(os.path.realpath(__file__))[-4:], os.path.dirname(os.path.realpath(__file__)))[0])
 from utils import *
 
 def num1():
