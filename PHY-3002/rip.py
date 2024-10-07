@@ -7,6 +7,9 @@ from matplotlib.image import imread
 from scipy.signal import boxcar
 from pylab import r_
 
+from scipy.ndimage import rotate
+
+
 def smooth(x, smoothing_param=3):
     window_len=smoothing_param*2+1
     s=r_[x[window_len-1:0:-1],x,x[-1:-window_len:-1]]
@@ -47,3 +50,6 @@ img_profile = np.mean(img, axis=1)/np.max(np.mean(img, axis=1))
 img_profile = smooth(img_profile, smoothing_param=10)
 plt.plot(img_y_axis_pixels, img_profile)
 plt.show()
+
+
+
