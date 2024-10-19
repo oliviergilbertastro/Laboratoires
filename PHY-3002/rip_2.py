@@ -85,8 +85,9 @@ rho_eau = 997 # kg/m^3
 def Lambda_relation_capillarite(f, tension_sup):
     return (tension_sup/rho_eau*2*np.pi/(f**2))**(1/3)*1000
 
-res = curve_fit(Lambda_relation_capillarite, frequences, Lambdas)[0]
-print("Tension superficielle =", res[0], "N/m")
+res = curve_fit(Lambda_relation_capillarite, frequences, Lambdas)
+print("Tension superficielle =", res, "N/m")
+res = res[0]
 x_fit = np.linspace(200,500,1000)
 y_fit = Lambda_relation_capillarite(x_fit, tension_sup=res[0])
 y_theorique = Lambda_relation_capillarite(x_fit, tension_sup=0.07199)
