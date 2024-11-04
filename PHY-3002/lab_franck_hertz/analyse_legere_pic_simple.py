@@ -8,6 +8,13 @@ import os
 import matplotlib
 # Grosseur du texte dans les figures
 matplotlib.rcParams.update({'font.size': 18})
+import parse
+import sys
+code_cours = "3002\lab_franck_hertz"
+#print(os.path.dirname(os.path.realpath(__file__)))
+parent_dir = parse.parse("{}\PHY-"+code_cours, os.path.dirname(os.path.realpath(__file__)))[0]
+sys.path.append(parent_dir)
+from utils import *
 
 """
 _____________________________________________________________________________
@@ -22,7 +29,7 @@ import numpy as np
 extension = input("Entrer l'extension du fichier à analyser:\n PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple")
 data = read_csv(r"PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple"+f"{extension}.csv", 9)
 
-
+#data = read_csv(r"PHY-3002\lab_franck_hertz\exemples_de_fichiers\exemple_de_donnees.csv", 9)
 
 
 
@@ -102,7 +109,7 @@ from outils_analyse.fits import linear_regression
 res = compute_conversion_factors(valeurs_cropped_debutant_par_t0, 0, 2)
 
 valeurs_cropped_debutant_par_t0[:,0] = valeurs_cropped_debutant_par_t0[:,0]*np.abs(res[0])
-valeurs_cropped_debutant_par_t0[:,1:] = valeurs_cropped_debutant_par_t0[:,1:]/(1) #devrait être l'échelle
+valeurs_cropped_debutant_par_t0[:,1:] = valeurs_cropped_debutant_par_t0[:,1:]#*(3/2) #devrait être l'échelle
 
 # Mettre vos données avec les bonnes unités à la place et vos informations par rapport à la pente ici
 valeurs_avec_bonnes_unites = valeurs_cropped_debutant_par_t0  # Array de trois colonnes
@@ -174,11 +181,18 @@ plt.show()
 
 
 # V_res
-
-distances_pics = []
+pics = valeurs_avec_bonnes_unites_determination_des_pics[liste_des_indexes_des_pics, 0]
+distances_pics = pics[1:]-pics[:-1]
 v_res = np.mean(distances_pics)
 
+#print("V_res:", np.around(v_res, decimals=3), "V")
+print_color(f"V_res: {np.around(v_res, decimals=3)} V")
 
+# Potentiel de charge:
+u1 = float(input("Entrer la valeur de U1 (en V):\n"))
+w = valeurs_avec_bonnes_unites_determination_des_pics[liste_des_indexes_des_pics[0], 0]+u1-v_res
+#print("Potentiel de charge W:", np.around(w, decimals=3), "V")
+print_color(f"Potentiel de charge W: {np.around(w, decimals=3)} V")
 
 
 
