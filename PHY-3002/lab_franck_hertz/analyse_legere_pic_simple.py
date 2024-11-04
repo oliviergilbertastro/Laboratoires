@@ -100,9 +100,11 @@ from outils_analyse.fits import linear_regression
 
 res = compute_conversion_factors(valeurs_cropped_debutant_par_t0, 0, 2)
 
+valeurs_cropped_debutant_par_t0[:,0] = valeurs_cropped_debutant_par_t0[:,0]*np.abs(res[0])
+valeurs_cropped_debutant_par_t0[:,1:] = valeurs_cropped_debutant_par_t0[:,1:]/(1) #pourquoi c'est pas 3??
 
 # Mettre vos données avec les bonnes unités à la place et vos informations par rapport à la pente ici
-valeurs_avec_bonnes_unites = None  # Array de trois colonnes
+valeurs_avec_bonnes_unites = valeurs_cropped_debutant_par_t0  # Array de trois colonnes
 facteur_valeur = res[0]  # Nombre à virgule
 facteur_incertitude = res[1]  # Nombre à virgule
 
@@ -133,7 +135,7 @@ _____________________________________________________________________________
 # Mettre votre code ici
 
 
-
+maxs = get_peaks_indices(valeurs_avec_bonnes_unites, 1, hauteur_minimum=np.max(valeurs_avec_bonnes_unites[:,1])/20, distance_minumum=(len(valeurs_avec_bonnes_unites[:,1])/7))
 
 
 
@@ -144,8 +146,8 @@ _____________________________________________________________________________
 
 
 # Mettre vos données avec les bonnes unités à la place du None
-valeurs_avec_bonnes_unites_determination_des_pics = None  # Array de trois colonnes
-liste_des_indexes_des_pics = None  # Liste de nombres entiers
+valeurs_avec_bonnes_unites_determination_des_pics = valeurs_avec_bonnes_unites  # Array de trois colonnes
+liste_des_indexes_des_pics = maxs  # Liste de nombres entiers
 
 """
 _____________________________________________________________________________
