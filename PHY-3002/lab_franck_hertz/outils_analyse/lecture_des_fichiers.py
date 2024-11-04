@@ -73,7 +73,10 @@ def smooth(x, smoothing_param=3):
     y=np.convolve(w/np.sum(w),s,mode='valid')
     return y[smoothing_param:-smoothing_param] 
 
-def crop_ramp_actually_good(valeurs, indice_colonne_rampe, nb_of_stds=1):
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+def crop_ramp_actually_good(valeurs, indice_colonne_rampe, nb_of_stds=1, if_plot=False):
     """
     smooths the signal and thens finds the bounds so it's not complete dogshit
 
@@ -84,6 +87,20 @@ def crop_ramp_actually_good(valeurs, indice_colonne_rampe, nb_of_stds=1):
     ramp_length = len(valeurs[:,indice_colonne_rampe])
     ramp_mid = deltats_V[int(2*ramp_length/5):int(3*ramp_length/5)]
     ramp_mean, ramp_std = np.mean(ramp_mid), np.std(ramp_mid)
+
+
+    if if_plot:
+        x_fit = np.linspace(0, len(valeurs[:,indice_colonne_rampe]), len(valeurs[:,indice_colonne_rampe]))
+        intercept = curve_fit(lambda x,a,b: x*a+b, x_fit[int(2*ramp_length/5):int(3*ramp_length/5)], valeurs[int(2*ramp_length/5):int(3*ramp_length/5),indice_colonne_rampe])[0][1]
+        def line_func(x):
+            return x*ramp_mean+intercept
+        y_fit = line_func(x_fit)
+        plt.plot(valeurs[:,indice_colonne_rampe])
+        plt.plot(y_fit, "--")
+        plt.fill_between(x_fit, line_func(x_fit)-ramp_std*nb_of_stds, line_func(x_fit)+ramp_std*nb_of_stds)
+        plt.show()
+
+
 
     # Find the bounds
 

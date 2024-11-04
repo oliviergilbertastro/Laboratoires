@@ -67,7 +67,7 @@ _____________________________________________________________________________
 
 
 #cropped = crop_ramp(valeurs_en_array, 2, 0.0733, 10)
-cropped = crop_ramp_actually_good(valeurs_en_array, 2, 10)
+cropped = crop_ramp_actually_good(valeurs_en_array, 2, 10, if_plot=False)
 
 cropped[:, 0] = cropped[:, 0]-cropped[0, 0]
 
