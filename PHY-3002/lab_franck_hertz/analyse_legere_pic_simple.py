@@ -16,9 +16,9 @@ _____________________________________________________________________________
 # TODO: Lire le fichier des résultats et transformer les valeurs en un array numpy
 # Mettre votre code ici
 
+import numpy as np
 
-
-
+data = read_csv(r"C:\Users\olivi\Desktop\Devoirs\PhysElectronique\phys_electronique\PHY-3002\lab_franck_hertz\exemples_de_fichiers\exemple_de_donnees.csv", 9)
 
 
 
@@ -28,7 +28,7 @@ _____________________________________________________________________________
 
 
 # Mettre vos valeurs extraites à la place du None.
-valeurs_en_array = None  # Array de trois colonnes
+valeurs_en_array = np.array(data)  # Array de trois colonnes
 
 """
 _____________________________________________________________________________
@@ -59,14 +59,14 @@ _____________________________________________________________________________
 
 
 
+cropped = crop_ramp(valeurs_en_array, 2, 0.09, 1)
 
-
-
+cropped[:, 0] = cropped[:, 0]-cropped[0, 0]
 
 
 
 # Mettre vos données croppées remises à t_0=0 dans cette variable
-valeurs_cropped_debutant_par_t0 = None  # Array de trois colonnes
+valeurs_cropped_debutant_par_t0 = cropped  # Array de trois colonnes
 
 """
 _____________________________________________________________________________
@@ -96,16 +96,15 @@ _____________________________________________________________________________
 
 # Mettre votre code ici
 
+from outils_analyse.fits import linear_regression
 
-
-
-
+res = compute_conversion_factors(valeurs_cropped_debutant_par_t0, 0, 2)
 
 
 # Mettre vos données avec les bonnes unités à la place et vos informations par rapport à la pente ici
 valeurs_avec_bonnes_unites = None  # Array de trois colonnes
-facteur_valeur = None  # Nombre à virgule
-facteur_incertitude = None  # Nombre à virgule
+facteur_valeur = res[0]  # Nombre à virgule
+facteur_incertitude = res[1]  # Nombre à virgule
 
 """
 _____________________________________________________________________________
