@@ -1,6 +1,6 @@
 
 from outils_analyse.identification_des_pics import get_peaks_indices
-from outils_analyse.lecture_des_fichiers import read_csv, crop_ramp
+from outils_analyse.lecture_des_fichiers import read_csv, crop_ramp, crop_ramp_actually_good
 from outils_analyse.conversion_temps_en_potentiel import \
     compute_conversion_factors
 import matplotlib.pyplot as plt
@@ -18,9 +18,9 @@ _____________________________________________________________________________
 
 import numpy as np
 
-data = read_csv(r"PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple.csv", 9)
 
-
+extension = input("Entrer l'extension du fichier à analyser:\n PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple")
+data = read_csv(r"PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple"+f"{extension}.csv", 9)
 
 
 
@@ -29,7 +29,6 @@ data = read_csv(r"PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simpl
 
 # Mettre vos valeurs extraites à la place du None.
 valeurs_en_array = np.array(data)  # Array de trois colonnes
-
 """
 _____________________________________________________________________________
 """
@@ -48,6 +47,7 @@ plt.show()
 _____________________________________________________________________________
 """
 
+
 #TODO: Retirer les valeurs qui se trouvent à l'extérieur de l'activation du générateur de rampe.
 # Ne pas oublier de mettre le début de la rampe comme étant t=0.
 
@@ -59,7 +59,8 @@ _____________________________________________________________________________
 
 
 
-cropped = crop_ramp(valeurs_en_array, 2, 0.0733, 10)
+#cropped = crop_ramp(valeurs_en_array, 2, 0.0733, 10)
+cropped = crop_ramp_actually_good(valeurs_en_array, 2, 10)
 
 cropped[:, 0] = cropped[:, 0]-cropped[0, 0]
 
@@ -172,8 +173,10 @@ plt.show()
 
 
 
+# V_res
 
-
+distances_pics = []
+v_res = np.mean(distances_pics)
 
 
 

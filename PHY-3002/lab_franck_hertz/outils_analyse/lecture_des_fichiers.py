@@ -60,3 +60,53 @@ def crop_ramp(valeurs: np.array, indice_colonne_rampe: int, zero_threshold: floa
     cropped_array = valeurs[index_debut:index_fin]
 
     return cropped_array
+
+
+from scipy.signal import boxcar
+from pylab import r_
+
+
+def smooth(x, smoothing_param=3):
+    window_len=smoothing_param*2+1
+    s=r_[x[window_len-1:0:-1],x,x[-1:-window_len:-1]]
+    w=boxcar(smoothing_param*2+1)
+    y=np.convolve(w/np.sum(w),s,mode='valid')
+    return y[smoothing_param:-smoothing_param] 
+
+def crop_ramp_actually_good(valeurs, indice_colonne_rampe, nb_of_stds=1):
+    """
+    smooths the signal and thens finds the bounds so it's not complete dogshit
+
+    assumes the middle fifth of the data is the ramp
+    """
+    valeurs[:,indice_colonne_rampe] = smooth(valeurs[:,indice_colonne_rampe], 3)
+    deltats_V = valeurs[2:, indice_colonne_rampe] - valeurs[:-2, indice_colonne_rampe]
+    ramp_length = len(valeurs[:,indice_colonne_rampe])
+    ramp_mid = deltats_V[int(2*ramp_length/5):int(3*ramp_length/5)]
+    ramp_mean, ramp_std = np.mean(ramp_mid), np.std(ramp_mid)
+
+    # Find the bounds
+
+    lo, hi = int(ramp_length/2), int(ramp_length/2)
+
+    x = deltats_V[lo]
+    try:
+        while (x > ramp_mean-ramp_std*nb_of_stds and x < ramp_mean+ramp_std*nb_of_stds):
+            lo -= 1
+            x = deltats_V[lo]
+        lo += 1
+    except:
+        lo = 0
+
+    x = deltats_V[hi]
+    try:
+        while (x > ramp_mean-ramp_std*nb_of_stds and x < ramp_mean+ramp_std*nb_of_stds):
+            hi += 1
+            x = deltats_V[hi]
+        hi -= 1
+    except:
+        hi = len(valeurs)-1
+
+    #print(lo, hi)
+
+    return valeurs[lo:hi]
