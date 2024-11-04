@@ -18,7 +18,7 @@ _____________________________________________________________________________
 
 import numpy as np
 
-data = read_csv(r"PHY-3002\lab_franck_hertz\exemples_de_fichiers\exemple_de_donnees.csv", 9)
+data = read_csv(r"PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple.csv", 9)
 
 
 
@@ -59,7 +59,7 @@ _____________________________________________________________________________
 
 
 
-cropped = crop_ramp(valeurs_en_array, 2, 0.09, 1)
+cropped = crop_ramp(valeurs_en_array, 2, 0.0733, 10)
 
 cropped[:, 0] = cropped[:, 0]-cropped[0, 0]
 
@@ -101,7 +101,7 @@ from outils_analyse.fits import linear_regression
 res = compute_conversion_factors(valeurs_cropped_debutant_par_t0, 0, 2)
 
 valeurs_cropped_debutant_par_t0[:,0] = valeurs_cropped_debutant_par_t0[:,0]*np.abs(res[0])
-valeurs_cropped_debutant_par_t0[:,1:] = valeurs_cropped_debutant_par_t0[:,1:]/(1) #pourquoi c'est pas 3??
+valeurs_cropped_debutant_par_t0[:,1:] = valeurs_cropped_debutant_par_t0[:,1:]/(1) #devrait être l'échelle
 
 # Mettre vos données avec les bonnes unités à la place et vos informations par rapport à la pente ici
 valeurs_avec_bonnes_unites = valeurs_cropped_debutant_par_t0  # Array de trois colonnes
