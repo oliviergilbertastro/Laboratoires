@@ -26,7 +26,7 @@ _____________________________________________________________________________
 import numpy as np
 
 
-extension = input("Entrer l'extension du fichier à analyser:\n PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple")
+extension = input("Entrer l'extension du fichier à analyser:\nPHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple")
 data = read_csv(r"PHY-3002\lab_franck_hertz\courbe_excitation_electronique_simple"+f"{extension}.csv", 9)
 
 #data = read_csv(r"PHY-3002\lab_franck_hertz\exemples_de_fichiers\exemple_de_donnees.csv", 9)
