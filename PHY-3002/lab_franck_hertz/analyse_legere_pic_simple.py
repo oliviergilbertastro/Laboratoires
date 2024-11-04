@@ -18,7 +18,7 @@ _____________________________________________________________________________
 
 import numpy as np
 
-data = read_csv(r"C:\Users\olivi\Desktop\Devoirs\PhysElectronique\phys_electronique\PHY-3002\lab_franck_hertz\exemples_de_fichiers\exemple_de_donnees.csv", 9)
+data = read_csv(r"PHY-3002\lab_franck_hertz\exemples_de_fichiers\exemple_de_donnees.csv", 9)
 
 
 
