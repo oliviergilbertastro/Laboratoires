@@ -48,6 +48,8 @@ plt.plot(valeurs_en_array[:, 0], valeurs_en_array[:, 1], label="Tensions entre l
 plt.xlabel("Temps [s]")
 plt.ylabel("Tension [V]")
 plt.legend()
+plt.subplots_adjust(left=0.158, bottom=0.145, right=0.967, top=0.955, wspace=0.2, hspace=0)
+plt.savefig(f"PHY-3002/Graph_FH/donnees_brutes{extension}.png")
 plt.show()
 
 """
@@ -90,6 +92,8 @@ plt.plot(valeurs_cropped_debutant_par_t0[:, 0], valeurs_cropped_debutant_par_t0[
 plt.xlabel("Temps [s]")
 plt.ylabel("Tension [V]")
 plt.legend()
+plt.subplots_adjust(left=0.158, bottom=0.145, right=0.967, top=0.955, wspace=0.2, hspace=0)
+plt.savefig(f"PHY-3002/Graph_FH/donnes_cropped{extension}.png")
 plt.show()
 
 """
@@ -131,6 +135,8 @@ plt.plot(valeurs_avec_bonnes_unites[:, 0], valeurs_avec_bonnes_unites[:, 1],
 plt.xlabel("Tension entre G1 et le ground [V]")
 plt.ylabel("Courant mesuré [nA]")
 plt.legend()
+plt.subplots_adjust(left=0.158, bottom=0.145, right=0.967, top=0.955, wspace=0.2, hspace=0)
+plt.savefig(f"PHY-3002/Graph_FH/donnes_avec_bonnes_unites{extension}.png")
 plt.show()
 
 """
@@ -175,6 +181,8 @@ plt.scatter(valeurs_avec_bonnes_unites_determination_des_pics[liste_des_indexes_
             label="Estimation des pics")
 plt.ylabel("Courant mesuré [nA]")
 plt.legend()
+plt.subplots_adjust(left=0.158, bottom=0.145, right=0.967, top=0.955, wspace=0.2, hspace=0)
+plt.savefig(f"PHY-3002/Graph_FH/estimation_des_pics{extension}.png")
 plt.show()
 
 
@@ -194,5 +202,7 @@ w = valeurs_avec_bonnes_unites_determination_des_pics[liste_des_indexes_des_pics
 #print("Potentiel de charge W:", np.around(w, decimals=3), "V")
 print_color(f"Potentiel de charge W: {np.around(w, decimals=3)} V")
 
-
+with open(f'PHY-3002/lab_franck_hertz/analyse{extension}.txt', 'w') as output:
+    message = f"Pics: {pics}\nU1: {u1} V\nV_res: {np.around(v_res, decimals=3)} V\nPotentiel de charge W: {np.around(w, decimals=3)} V"
+    output.write(message)
 
