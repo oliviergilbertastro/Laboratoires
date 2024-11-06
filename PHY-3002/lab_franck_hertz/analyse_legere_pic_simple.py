@@ -202,6 +202,8 @@ w = valeurs_avec_bonnes_unites_determination_des_pics[liste_des_indexes_des_pics
 #print("Potentiel de charge W:", np.around(w, decimals=3), "V")
 print_color(f"Potentiel de charge W: {np.around(w, decimals=3)} V")
 
+
+# Enregistre les infos calculées dans un fichier .txt
 with open(f'PHY-3002/lab_franck_hertz/analyse{extension}.txt', 'w') as output:
     message = f"Pics: {pics}\nU1: {u1} V\nV_res: {np.around(v_res, decimals=3)} V\nPotentiel de charge W: {np.around(w, decimals=3)} V"
     output.write(message)
