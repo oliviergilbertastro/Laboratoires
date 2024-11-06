@@ -176,12 +176,12 @@ w_exp=np.mean([1.789,1.764,1.817,1.791,1.809])
 def find_combination(pic):
     """
     pic = u1 (v)
-    u2 (v)
     """
     energy = pic+u2-w_exp
     # get upper bounds for each component (lower bounds are always 0):
-    bounds = [round(energy/4.89),round(energy/5.46),round(energy/6.70)] # [h_bounds, k_bounds, l_bounds]
-    #print(bounds)
+    #        [     h_bound,           k_bound,            l_bound     ]
+    bounds = [round(energy/4.89),round(energy/5.46),round(energy/6.70)]
+
     # Calculate all possible energy combinations
     energies = []
     delta_energy_sq = []
@@ -194,7 +194,6 @@ def find_combination(pic):
                 delta_energy_sq.append((energy-sim_energy)**2)
                 linear_combinations.append([h,k,l])
     # Get best combination
-    #print(delta_energy_sq)
     index = delta_energy_sq.index(min(delta_energy_sq))
     return linear_combinations[index], energies[index]
 
