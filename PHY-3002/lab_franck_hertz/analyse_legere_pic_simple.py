@@ -1,6 +1,6 @@
 
 from outils_analyse.identification_des_pics import get_peaks_indices
-from outils_analyse.lecture_des_fichiers import read_csv, crop_ramp, crop_ramp_actually_good
+from outils_analyse.lecture_des_fichiers import read_csv, crop_ramp, crop_ramp_better
 from outils_analyse.conversion_temps_en_potentiel import \
     compute_conversion_factors
 import matplotlib.pyplot as plt
@@ -69,7 +69,7 @@ _____________________________________________________________________________
 
 
 #cropped = crop_ramp(valeurs_en_array, 2, 0.0733, 10)
-cropped = crop_ramp_actually_good(valeurs_en_array, 2, 10, if_plot=False)
+cropped = crop_ramp_better(valeurs_en_array, 2, 20, if_plot=True)
 
 cropped[:, 0] = cropped[:, 0]-cropped[0, 0]
 

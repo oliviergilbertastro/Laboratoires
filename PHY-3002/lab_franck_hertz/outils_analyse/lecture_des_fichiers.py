@@ -75,29 +75,46 @@ def smooth(x, smoothing_param=3):
 
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+import copy
 
-def crop_ramp_actually_good(valeurs, indice_colonne_rampe, nb_of_stds=1, if_plot=False):
+def crop_ramp_better(valeurs, indice_colonne_rampe, nb_of_stds=1, if_plot=False, verbose=False):
     """
-    smooths the signal and thens finds the bounds so it's not complete dogshit
+    smooths the signal and thens finds the bounds so it's good
 
     assumes the middle fifth of the data is the ramp
     """
+    valeurs_og = copy.copy(valeurs)
     valeurs[:,indice_colonne_rampe] = smooth(valeurs[:,indice_colonne_rampe], 3)
-    deltats_V = valeurs[2:, indice_colonne_rampe] - valeurs[:-2, indice_colonne_rampe]
+    deltats_V = valeurs[1:, indice_colonne_rampe] - valeurs[:-1, indice_colonne_rampe]
     ramp_length = len(valeurs[:,indice_colonne_rampe])
     ramp_mid = deltats_V[int(2*ramp_length/5):int(3*ramp_length/5)]
     ramp_mean, ramp_std = np.mean(ramp_mid), np.std(ramp_mid)
 
 
     if if_plot:
+        plt.plot(valeurs_og[:,indice_colonne_rampe], linewidth=3, color="orange", label="Original")
+        plt.plot(valeurs[:,indice_colonne_rampe], linewidth=1.5, color="blue", label="Lissé")
+        plt.xlabel("Index")
+        plt.ylabel("Tension [V]")
+        plt.legend(fontsize=15)
+        plt.show()
+
+        #plt.plot([0,1,2], [4,6,5], "--")
+        #plt.fill_between([0,1,2], [3,5,4], [5,7,6], color="red", alpha=0.3)
+        #plt.show()
+
         x_fit = np.linspace(0, len(valeurs[:,indice_colonne_rampe]), len(valeurs[:,indice_colonne_rampe]))
-        intercept = curve_fit(lambda x,a,b: x*a+b, x_fit[int(2*ramp_length/5):int(3*ramp_length/5)], valeurs[int(2*ramp_length/5):int(3*ramp_length/5),indice_colonne_rampe])[0][1]
-        def line_func(x):
-            return x*ramp_mean+intercept
-        y_fit = line_func(x_fit)
+        def slope(x,a,b):
+            return x*a+b
+
+        res = curve_fit(slope, x_fit[int(2*ramp_length/5):int(3*ramp_length/5)], valeurs[int(2*ramp_length/5):int(3*ramp_length/5),indice_colonne_rampe])[0]
+        y_fit = slope(x_fit,res[0],res[1])
+        #plt.plot(valeurs[int(2*ramp_length/5):int(3*ramp_length/5),indice_colonne_rampe])
         plt.plot(valeurs[:,indice_colonne_rampe])
-        plt.plot(y_fit, "--")
-        plt.fill_between(x_fit, line_func(x_fit)-ramp_std*nb_of_stds, line_func(x_fit)+ramp_std*nb_of_stds)
+        plt.plot(x_fit, y_fit, "--")
+        plt.fill_between(x_fit, y_fit-ramp_std*nb_of_stds, y_fit+ramp_std*nb_of_stds, color="blue", alpha=0.3)
+        plt.xlabel("Index")
+        plt.ylabel("Tension [V]")
         plt.show()
 
 
@@ -106,24 +123,25 @@ def crop_ramp_actually_good(valeurs, indice_colonne_rampe, nb_of_stds=1, if_plot
 
     lo, hi = int(ramp_length/2), int(ramp_length/2)
 
-    x = deltats_V[lo]
+    x = valeurs[lo,indice_colonne_rampe]
     try:
-        while (x > ramp_mean-ramp_std*nb_of_stds and x < ramp_mean+ramp_std*nb_of_stds):
+        while (x > y_fit[lo]-ramp_std*nb_of_stds and x < y_fit[lo]+ramp_std*nb_of_stds):
             lo -= 1
-            x = deltats_V[lo]
+            x = valeurs[lo,indice_colonne_rampe]
         lo += 1
     except:
         lo = 0
 
-    x = deltats_V[hi]
+    x = valeurs[hi,indice_colonne_rampe]
     try:
-        while (x > ramp_mean-ramp_std*nb_of_stds and x < ramp_mean+ramp_std*nb_of_stds):
+        while (x > y_fit[hi]-ramp_std*nb_of_stds and x < y_fit[hi]+ramp_std*nb_of_stds):
             hi += 1
-            x = deltats_V[hi]
-        hi -= 1
+            x = valeurs[hi,indice_colonne_rampe]
+        hi += 1
     except:
         hi = len(valeurs)-1
 
-    #print(lo, hi)
+    if verbose:
+        print(lo, hi)
 
-    return valeurs[lo:hi]
+    return valeurs_og[lo:hi]
