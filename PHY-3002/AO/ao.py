@@ -48,7 +48,7 @@ def find_nearest_index(array, value):
 CM_PER_PX = 1/(243.347)
 
 frequencies = [34,36,38,40,42,44,46] # MHz
-frequencies = [42,44,46] # MHz
+#frequencies = [42,44,46] # MHz
 
 # y,x
 centers = [[428,1041], [669,1131], [725,1102]] # bleu, vert, rouge
