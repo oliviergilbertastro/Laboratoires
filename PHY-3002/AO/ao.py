@@ -48,6 +48,7 @@ def find_nearest_index(array, value):
 CM_PER_PX = 1/(243.347)
 
 frequencies = [34,36,38,40,42,44,46] # MHz
+frequencies = [42,44,46] # MHz
 
 # y,x
 centers = [[428,1041], [669,1131], [725,1102]] # bleu, vert, rouge
@@ -85,8 +86,8 @@ for couleur in choice:
         img_x_axis_pixels -= centers[i][1]
         img_x_axis_pixels *= CM_PER_PX
 
-        img = img[ranges[i][0]:ranges[i][1], centers[i][1]-400:centers[i][1]+400]
-        img_x_axis_pixels = img_x_axis_pixels[centers[i][1]-400:centers[i][1]+400]
+        img = img[ranges[i][0]:ranges[i][1], centers[i][1]-500:centers[i][1]+500]
+        img_x_axis_pixels = img_x_axis_pixels[centers[i][1]-500:centers[i][1]+500]
         if if_plot:
             plt.imshow(img, origin="lower", cmap=["Blues","Greens","Reds"][i])
             plt.title(f"{couleur} {f}MHz", fontsize=15)
@@ -115,8 +116,9 @@ for couleur in choice:
             if bad_peaks == "":
                 ok_bad = True
                 break
-            bad_peaks.split(sep=",")
-            list(bad_peaks).sort()
+            bad_peaks = bad_peaks.split(sep=",")
+            bad_peaks.sort()
+            print(bad_peaks)
             for k in bad_peaks[::-1]:
                 peaks.pop(int(k))
             while not ok_good:
@@ -126,5 +128,5 @@ for couleur in choice:
                     break
                 peaks.append(find_nearest_index(img_x_axis_pixels,float(good_peaks)))
             peaks.sort()
-        array_to_save = np.array([img_x_axis_pixels[peaks], peaks])
+        array_to_save = np.array([img_x_axis_pixels[peaks], np.array(range(len(peaks)))-int(len(peaks)/2)])
         np.savetxt(f"PHY-3002/AO/data/{couleur}_{f}.txt", array_to_save)
