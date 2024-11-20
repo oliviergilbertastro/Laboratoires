@@ -20,7 +20,7 @@ def find_line(x_data, y_data, sigma=None):
     """
     gives intercept and slope
     """
-    res = curve_fit(lambda x,a,b: x*a+b, x_data, y_data, sigma=sigma)
+    res = curve_fit(lambda x,a: x*a, x_data, y_data, sigma=sigma)
     return res[0]
 
 frequencies = [34,36,38,40,42,44,46] # MHz
@@ -39,14 +39,14 @@ for k, couleur in enumerate(["bleu","vert","rouge"]):
     ax1 = plt.subplot(111)
     slopes = []
     for i in range(5):
-        slope, intercept = find_line(frequencies, angles[:,i], uncertainties[:,i])
+        slope = find_line(frequencies, angles[:,i], uncertainties[:,i])[0]
         print(f"alpha = {slope}f")
         slopes.append(slope)
         plt.errorbar(frequencies, angles[:,i], uncertainties[:,i], fmt="o", color=["blue","green","red"][k])
         #plt.plot(frequencies, angles[:,i], "o", color=["blue","green","red"][k])
         plt.plot(frequencies, angles[:,i], "-", color=["blue","green","red"][k])
-        plt.plot(frequencies, slope*np.array(frequencies)+intercept, "--", color="black")
-
+        plt.plot(frequencies, slope*np.array(frequencies), "--", color="black")
+    print("v_s =", lambdas[k]*1E6/(slopes[3]/1000*1000000))
     col_labels=[r'$m$',r'Pente [$f/\alpha$]']
     table_vals=np.array([np.array([-2,-1,0,1,2], dtype=int),np.around(slopes, decimals=2)]).T
     # the rectangle is where I want to place the table
@@ -71,3 +71,5 @@ for k, couleur in enumerate(["bleu","vert","rouge"]):
     ax1.yaxis.set_tick_params(labelsize=15)
     plt.savefig(f"PHY-3002/AO/graph/final_{couleur}.png")
     plt.show()
+
+
