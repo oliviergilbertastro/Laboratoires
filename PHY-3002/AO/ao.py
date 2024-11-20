@@ -89,8 +89,13 @@ for couleur in choice:
         img = img[ranges[i][0]:ranges[i][1], centers[i][1]-500:centers[i][1]+500]
         img_x_axis_pixels = img_x_axis_pixels[centers[i][1]-500:centers[i][1]+500]
         if if_plot:
+            ax1 = plt.subplot(111)
             plt.imshow(img, origin="lower", cmap=["Blues","Greens","Reds"][i])
             plt.title(f"{couleur} {f}MHz", fontsize=15)
+            plt.ylabel(r"pos $y$ [px]", fontsize=15)
+            plt.xlabel(r"pos $x$ [px]", fontsize=15)
+            ax1.xaxis.set_tick_params(labelsize=13)
+            ax1.yaxis.set_tick_params(labelsize=13)
             plt.show()
 
         img_profile = np.mean(img, axis=0)/np.max(np.mean(img, axis=0))
@@ -107,9 +112,15 @@ for couleur in choice:
             ok_good = False
             for k in range(len(img_x_axis_pixels[peaks])):
                 print(f"Pic {k}: {img_x_axis_pixels[peaks][k]}")
-
+            img_profile = img_profile/np.max(img_profile)
+            ax1 = plt.subplot(111)
             plt.plot(img_x_axis_pixels[peaks], img_profile[peaks], "o")
             plt.plot(img_x_axis_pixels, img_profile)
+            plt.title(f"{couleur} {f}MHz", fontsize=15)
+            plt.ylabel(r"Intensité $I$ [$I_0$]", fontsize=15)
+            plt.xlabel(r"pos $x$ [cm]", fontsize=15)
+            ax1.xaxis.set_tick_params(labelsize=13)
+            ax1.yaxis.set_tick_params(labelsize=13)
             plt.show()
 
             bad_peaks = input("Entrez l'indice de chaque pic indésirable séparés d'une virgule, puis appuyez sur 'ENTER':\n")

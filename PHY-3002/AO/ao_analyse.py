@@ -70,7 +70,7 @@ for k, couleur in enumerate(["bleu","vert","rouge"]):
     plt.subplots_adjust(0.2,0.13,0.98,0.93)
     ax1.xaxis.set_tick_params(labelsize=15)
     ax1.yaxis.set_tick_params(labelsize=15)
-    plt.savefig(f"PHY-3002/AO/graph/final_{couleur}.png")
+    plt.savefig(f"PHY-3002/AO/graph/final_{couleur}.pdf")
     plt.show()
 
 
