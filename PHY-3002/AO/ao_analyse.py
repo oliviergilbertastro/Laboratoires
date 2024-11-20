@@ -24,6 +24,7 @@ def find_line(x_data, y_data, sigma=None):
     return res[0]
 
 frequencies = [34,36,38,40,42,44,46] # MHz
+mes_vs = []
 for k, couleur in enumerate(["bleu","vert","rouge"]):
     angles = []
     uncertainties = []
@@ -46,9 +47,9 @@ for k, couleur in enumerate(["bleu","vert","rouge"]):
         #plt.plot(frequencies, angles[:,i], "o", color=["blue","green","red"][k])
         plt.plot(frequencies, angles[:,i], "-", color=["blue","green","red"][k])
         plt.plot(frequencies, slope*np.array(frequencies), "--", color="black")
-    print("v_s =", lambdas[k]*1E6/(slopes[3]/1000*1000000))
+    mes_vs.append(lambdas[k]*1E6/(slopes[3]/1000*1000000))
     col_labels=[r'$m$',r'Pente [$f/\alpha$]']
-    table_vals=np.array([np.array([-2,-1,0,1,2], dtype=int),np.around(slopes, decimals=2)]).T
+    table_vals=np.array([np.array([-2,-1,0,1,2], dtype=int)[::-1],np.around(slopes, decimals=2)[::-1]]).T
     # the rectangle is where I want to place the table
     the_table = plt.table(cellText=table_vals,
                     colWidths = [0.05,0.12],
@@ -73,3 +74,25 @@ for k, couleur in enumerate(["bleu","vert","rouge"]):
     plt.show()
 
 
+
+
+
+import os, parse ,sys
+code_cours = "3002\AO"
+parent_dir = parse.parse("{}\PHY-"+code_cours, os.path.dirname(os.path.realpath(__file__)))[0]
+sys.path.append(parent_dir)
+from utils import *
+
+
+print_color("Avec bleu:", color="blue")
+
+v_s = np.mean(mes_vs), np.std(mes_vs)
+
+print_color(f"v_s = {v_s[0]} \pm {v_s[1]}")
+
+print_color("Sans bleu:", color="blue")
+
+mes_vs = mes_vs[1:]
+v_s = np.mean(mes_vs), np.std(mes_vs)
+
+print_color(f"v_s = {v_s[0]} \pm {v_s[1]}")
