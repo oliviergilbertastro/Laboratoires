@@ -96,3 +96,7 @@ mes_vs = mes_vs[1:]
 v_s = np.mean(mes_vs), np.std(mes_vs)
 
 print_color(f"v_s = {v_s[0]} \pm {v_s[1]}")
+
+print("Longueur d'onde ultrason:")
+for f in frequencies:
+    print(f"{f}: {v_s[0]/(f)} \pm {v_s[1]/(f)}")
