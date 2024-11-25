@@ -48,6 +48,7 @@ def find_nearest_index(array, value):
 CM_PER_PX = 1/(243.347)
 
 frequencies = [34,36,38,40,42,44,46] # MHz
+#frequencies = [42,44,46] # MHz
 
 # y,x
 centers = [[428,1041], [669,1131], [725,1102]] # bleu, vert, rouge
@@ -85,11 +86,16 @@ for couleur in choice:
         img_x_axis_pixels -= centers[i][1]
         img_x_axis_pixels *= CM_PER_PX
 
-        img = img[ranges[i][0]:ranges[i][1], centers[i][1]-400:centers[i][1]+400]
-        img_x_axis_pixels = img_x_axis_pixels[centers[i][1]-400:centers[i][1]+400]
+        img = img[ranges[i][0]:ranges[i][1], centers[i][1]-500:centers[i][1]+500]
+        img_x_axis_pixels = img_x_axis_pixels[centers[i][1]-500:centers[i][1]+500]
         if if_plot:
+            ax1 = plt.subplot(111)
             plt.imshow(img, origin="lower", cmap=["Blues","Greens","Reds"][i])
             plt.title(f"{couleur} {f}MHz", fontsize=15)
+            plt.ylabel(r"pos $y$ [px]", fontsize=15)
+            plt.xlabel(r"pos $x$ [px]", fontsize=15)
+            ax1.xaxis.set_tick_params(labelsize=13)
+            ax1.yaxis.set_tick_params(labelsize=13)
             plt.show()
 
         img_profile = np.mean(img, axis=0)/np.max(np.mean(img, axis=0))
@@ -106,17 +112,24 @@ for couleur in choice:
             ok_good = False
             for k in range(len(img_x_axis_pixels[peaks])):
                 print(f"Pic {k}: {img_x_axis_pixels[peaks][k]}")
-
+            img_profile = img_profile/np.max(img_profile)
+            ax1 = plt.subplot(111)
             plt.plot(img_x_axis_pixels[peaks], img_profile[peaks], "o")
             plt.plot(img_x_axis_pixels, img_profile)
+            plt.title(f"{couleur} {f}MHz", fontsize=15)
+            plt.ylabel(r"Intensité $I$ [$I_0$]", fontsize=15)
+            plt.xlabel(r"pos $x$ [cm]", fontsize=15)
+            ax1.xaxis.set_tick_params(labelsize=13)
+            ax1.yaxis.set_tick_params(labelsize=13)
             plt.show()
 
             bad_peaks = input("Entrez l'indice de chaque pic indésirable séparés d'une virgule, puis appuyez sur 'ENTER':\n")
             if bad_peaks == "":
                 ok_bad = True
                 break
-            bad_peaks.split(sep=",")
-            list(bad_peaks).sort()
+            bad_peaks = bad_peaks.split(sep=",")
+            bad_peaks.sort()
+            print(bad_peaks)
             for k in bad_peaks[::-1]:
                 peaks.pop(int(k))
             while not ok_good:
@@ -126,5 +139,5 @@ for couleur in choice:
                     break
                 peaks.append(find_nearest_index(img_x_axis_pixels,float(good_peaks)))
             peaks.sort()
-        array_to_save = np.array([img_x_axis_pixels[peaks], peaks])
+        array_to_save = np.array([img_x_axis_pixels[peaks], np.array(range(len(peaks)))-int(len(peaks)/2)])
         np.savetxt(f"PHY-3002/AO/data/{couleur}_{f}.txt", array_to_save)
