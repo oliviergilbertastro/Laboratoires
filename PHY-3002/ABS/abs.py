@@ -232,3 +232,18 @@ ax1.yaxis.set_tick_params(labelsize=14)
 plt.savefig(f"PHY-3002/ABS/correlation_plot.pdf")
 plt.show()
 
+
+# Error percent
+err_per = []
+for i in range(len(theoretical_lines)):
+    err_per.append(np.abs(theoretical_lines[i]-experimental_lines[i])/theoretical_lines[i]*100)
+
+fig = plt.figure(figsize=(10,7))
+ax1 = plt.subplot(111)
+plt.plot(theoretical_lines, err_per, ".", color="black")
+ax1.set_xlabel("$\lambda$ théorique [nm]", fontsize=15)
+ax1.set_ylabel("Erreur [%]", fontsize=15)
+ax1.xaxis.set_tick_params(labelsize=14)
+ax1.yaxis.set_tick_params(labelsize=14)
+#plt.savefig(f"PHY-3002/ABS/error_plot.pdf")
+plt.show()
