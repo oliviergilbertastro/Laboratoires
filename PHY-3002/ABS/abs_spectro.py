@@ -55,6 +55,8 @@ slider1 = Slider(ax1, label="Sensitivity", valmin=1, valmax=10, valinit=1)
 slider2 = Slider(ax2, label="Smoothing", valmin=1, valmax=10, valinit=1, valstep=int(1))
 # Plot the base spectrum
 spectrum_line, = ax.plot(wav, intensity, color="black", label="Spectrum")
+ax.set_xlabel("$\lambda$ [nm]", fontsize=15)
+ax.set_ylabel("Intensité normalisée", fontsize=15)
 #controls = iplt.imshow(controlVisual, yes=check1, ax=ax, origin="lower")
 sc = ax.scatter(abs_lines_x(1, intensity), abs_lines_y(1, intensity), color="red", label="Absorption lines")
 
@@ -92,10 +94,27 @@ def find_nearest_index(array, value):
     return idx
 
 compared_lines = []
+indices = []
 for i in range(len(abs_waves)):
     idx = find_nearest_index(theoretical_lines,abs_waves[i])
     th = theoretical_lines[idx]
     if (np.abs(th-abs_waves[i])/th < 0.01):
         compared_lines.append(abs_waves[i])
+        indices.append(find_nearest_index(wav,abs_waves[i]))
 for i in range(len(compared_lines)):
     print(f"{i}: {compared_lines[i]}")
+
+nus = []
+nus_prime = []
+for i in range(25):
+    pass
+
+ax1 = plt.subplot(111)
+plt.plot(wav, intensity, color="black")
+plt.plot(wav[indices], intensity[indices], "o", color="red")
+ax1.set_xlabel("$\lambda$ [nm]", fontsize=15)
+ax1.set_ylabel("Intensité normalisée", fontsize=15)
+ax1.xaxis.set_tick_params(labelsize=14)
+ax1.yaxis.set_tick_params(labelsize=14)
+#plt.savefig(f"PHY-3002/ABS/spectro_plot.pdf")
+plt.show()
