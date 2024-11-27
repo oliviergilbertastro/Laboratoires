@@ -209,6 +209,26 @@ the_table1 = plt.table(cellText=table_vals,
 the_table1.auto_set_font_size(False)
 the_table1.set_fontsize(10)
 the_table1.scale(1, 1)
+ax1.xaxis.set_tick_params(labelsize=14)
+ax1.yaxis.set_tick_params(labelsize=14)
+plt.savefig(f"PHY-3002/ABS/lignes_absorption.pdf")
+plt.show()
 
+
+
+
+
+# Correlation plot
+fig = plt.figure(figsize=(7,7))
+ax1 = plt.subplot(111)
+plt.plot([lines_nm[0], lines_nm[-1]], [lines_nm[0], lines_nm[-1]], "--", linewidth=2, color="red")
+plt.plot(theoretical_lines, experimental_lines, ".", color="black")
+for i in range(4):
+    plt.plot(lines_nm[i], lines_nm[i], "o", color=["blue","green","lime","lime"][i])
+ax1.set_xlabel("$\lambda$ théorique [nm]", fontsize=15)
+ax1.set_ylabel("$\lambda$ expérimental [nm]", fontsize=15)
+ax1.xaxis.set_tick_params(labelsize=14)
+ax1.yaxis.set_tick_params(labelsize=14)
+plt.savefig(f"PHY-3002/ABS/correlation_plot.pdf")
 plt.show()
 
