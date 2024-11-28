@@ -247,3 +247,29 @@ ax1.xaxis.set_tick_params(labelsize=14)
 ax1.yaxis.set_tick_params(labelsize=14)
 #plt.savefig(f"PHY-3002/ABS/error_plot.pdf")
 plt.show()
+
+
+
+nus_prime_fit = np.concatenate([nus_prime_bleus,nus_prime_verts_0])
+nus_prime_demi_fit = nus_prime_fit+1/2
+wav_fit = np.concatenate([exp_lines_bleus, exp_lines_verts_0])*1E-7 # wav en cm
+un_sur_wav_fit = 1/wav_fit
+
+def regression(nu_prime_demi, A, B, C):
+    return A+B*(nu_prime_demi)+C*(nu_prime_demi)**2
+
+res = curve_fit(regression, nus_prime_fit, un_sur_wav_fit)[0]
+print(res)
+
+print(f"Constante harmonique: {res[1]}")
+print(f"Constante anharmonique: {-res[2]}")
+
+x_fit = np.linspace(np.min(nus_prime_demi_fit), np.max(nus_prime_demi_fit), 1000)
+ax1 = plt.subplot(111)
+plt.plot(nus_prime_demi_fit, un_sur_wav_fit, "o", color="black", label="données")
+plt.plot(x_fit, regression(x_fit, res[0], res[1], res[2]), "-", linewidth=2, color="red", label="fit")
+ax1.set_ylabel(r"$1/\lambda$ [nm]", fontsize=15)
+ax1.set_xlabel(r"$\nu'+1/2$", fontsize=15)
+ax1.xaxis.set_tick_params(labelsize=14)
+ax1.yaxis.set_tick_params(labelsize=14)
+plt.show()
