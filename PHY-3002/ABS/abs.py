@@ -268,7 +268,7 @@ x_fit = np.linspace(np.min(nus_prime_demi_fit), np.max(nus_prime_demi_fit), 1000
 ax1 = plt.subplot(111)
 plt.plot(nus_prime_demi_fit, un_sur_wav_fit, "o", color="black", label="données")
 plt.plot(x_fit, regression(x_fit, res[0], res[1], res[2]), "-", linewidth=2, color="red", label="fit")
-ax1.set_ylabel(r"$1/\lambda$ [nm]", fontsize=15)
+ax1.set_ylabel(r"$1/\lambda$ [cm$^{-1}$]", fontsize=15)
 ax1.set_xlabel(r"$\nu'+1/2$", fontsize=15)
 ax1.xaxis.set_tick_params(labelsize=14)
 ax1.yaxis.set_tick_params(labelsize=14)
