@@ -19,7 +19,7 @@ def energy(R):
 radius = np.linspace(1E3, 3*1E4, 100000)
 
 
-R = 5/(3*G)*((3/2)**7*np.pi**2/(M*m_n**8))**(1/3)
+R = 2*hbar**2/(3*G)*((3/2)**7*np.pi**2/(M*m_n**8))**(1/3)
 
 
 E_mean = mean_energy(radius)
@@ -28,7 +28,8 @@ E_tot = energy(radius)
 
 
 r = radius[(list(E_tot).index(np.min(E_tot)))] # meters
-print(f"Rayon qui minimise: {r/1000} km")
+print(f"Rayon qui minimise théorique: {R/1000} km")
+print(f"Rayon qui minimise pratique: {r/1000} km")
 
 
 ax1 = plt.subplot(111)
