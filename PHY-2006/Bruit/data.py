@@ -67,8 +67,8 @@ xmin2, xmax2 = ax2.get_xlim()
 x2 = np.linspace(xmin2, xmax2, 100)
 p2 = norm.pdf(x2, mu2, std2)
 
-ax1.plot(x1, p1, 'k', linewidth=3, color='b', linestyle='dashed')
-ax2.plot(x2, p2, 'k', linewidth=3, color='r', linestyle='dashed')
+ax1.plot(x1, p1, linewidth=3, color='b', linestyle='dashed')
+ax2.plot(x2, p2, linewidth=3, color='r', linestyle='dashed')
 
 ax1.vlines(mu1, 0, 35, linewidth=2, color='b', alpha=0.8, linestyle=(0, (1,1)))
 ax2.vlines(mu2, 0, 35, linewidth=2, color='r', alpha=0.8, linestyle=(0, (1,1)))
@@ -82,12 +82,27 @@ plt.show()
 
 analyse = []
 
+
 for i in range(int(len(clusters_of_data)/2)):
     analyse.extend(data_lows[i])
     analyse.extend(data_highs[i])
 
+bas = []
+haut = []
+for i in range(len(data_lows)):
+    bas.extend(data_lows[i])
+    haut.extend(data_highs[i])
 
+ecart_bas = []
+ecart_haut = []
+from tqdm import tqdm
+for i in tqdm(range(1,len(bas))):
+    ecart_bas.append(np.std(bas[:i]))
+    ecart_haut.append(np.std(haut[:i]))
 
+plt.plot(ecart_bas)
+plt.plot(ecart_haut)
+plt.show()
 
 
 
