@@ -8,6 +8,8 @@
 # Bruce Sherwood
 # Claudine Allen
 """
+
+
 from vpython import *
 import numpy as np
 import math
@@ -76,11 +78,59 @@ def checkCollisions():
             dr = ai - aj   # la boucle dans une boucle itère pour calculer cette distance vectorielle dr entre chaque paire de sphère
             if mag2(dr) < r2:   # test de collision où mag2(dr) qui retourne la norme élevée au carré de la distance intersphère dr
                 hitlist.append([i,j]) # liste numérotant toutes les paires de sphères en collision
+    
     return hitlist
+
+
+
+def suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision):
+    num = 1  # Indice fixe, pourrait être généralisé en fonction du cas d'utilisation
+
+    for paire in hitlist:
+        # Vérifie si l'indice courant (num) est l'un des éléments de la paire
+        if num == paire[0] or num == paire[1]:  
+            # Ajoute le temps écoulé entre les collisions à la liste des temps
+            liste_temps_entre_collision.append(temps_entre_collision)
+            temps_entre_collision = 0  # Réinitialise le temps entre collisions
+
+            # Initialisation de la distance parcourue
+            distance = 0
+            pos_précédente.append((apos[num]))  # Ajoute la position actuelle pour le calcul de la distance
+
+            # Vérifie qu'il y a plus d'une position dans la liste avant de calculer les différences
+            if len(pos_précédente) > 1:  # Éviter les erreurs si la liste est vide ou contient une seule valeur
+                for i in range(1, len(pos_précédente)):
+                    # Calcul de la différence de position entre deux étapes successives
+                    delta_vect = pos_précédente[i] - pos_précédente[i-1] 
+                    delta_x, delta_y, delta_z = delta_vect.x, delta_vect.y, delta_vect.z
+
+                    # Additionne les distances entre les positions successives
+                    distance += np.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
+
+            # Ajoute la distance totale parcourue entre les collisions à la liste
+            liste_distance_entre_collision.append(distance)
+
+            # Remise à zéro de la liste des positions, mais en gardant la dernière position
+            pos_précédente.clear()  
+            pos_précédente.append((apos[num]))  # Ajoute la dernière position après le clear
+
+        else:
+            # Si aucune collision n'est détectée, met à jour le temps entre collisions et ajoute la position actuelle à la liste
+            temps_entre_collision += dt
+            pos_précédente.append((apos[num]))  # Ajout de la position actuelle sous forme de tableau NumPy
+
+
+
 
 #### BOUCLE PRINCIPALE POUR L'ÉVOLUTION TEMPORELLE DE PAS dt ####
 ## ATTENTION : la boucle laisse aller l'animation aussi longtemps que souhaité, assurez-vous de savoir comment interrompre vous-même correctement (souvent `ctrl+c`, mais peut varier)
 ## ALTERNATIVE : vous pouvez bien sûr remplacer la boucle "while" par une boucle "for" avec un nombre d'itérations suffisant pour obtenir une bonne distribution statistique à l'équilibre
+temps_entre_collision = 0
+pos_précédente = []
+liste_temps_entre_collision = []
+liste_distance_entre_collision = []
+
+
 
 for k in range(1000):
     rate(300)  # limite la vitesse de calcul de la simulation pour que l'animation soit visible à l'oeil humain!
@@ -145,6 +195,11 @@ for k in range(1000):
         p[j] = pcomj+mass*Vcom
         apos[i] = posi+(p[i]/mass)*deltat # move forward deltat in time, ramenant au même temps où sont rendues les autres sphères dans l'itération
         apos[j] = posj+(p[j]/mass)*deltat
+            # **Appel de la fonction suit() ici**
+    suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision)
 
 
-print(p)
+
+#print(p)
+print('temps moyen',np.mean(liste_temps_entre_collision))
+print('distance moyenne',np.mean(liste_distance_entre_collision))
