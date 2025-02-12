@@ -198,7 +198,7 @@ for k in range(1000):
             # **Appel de la fonction suit() ici**
     suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision)
 
-
+np.savetxt("data.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision]).T)
 
 #print(p)
 print('temps moyen',np.mean(liste_temps_entre_collision))
