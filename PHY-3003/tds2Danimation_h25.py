@@ -135,6 +135,7 @@ def suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_colli
         # Remise à zéro de la liste des positions, mais en gardant la dernière position
         pos_précédente.clear()
         pos_précédente.append(apos[num])
+        print('pos_précédente', pos_précédente)
         sommation = 1
 
     if collision_detectée==False:
@@ -143,7 +144,7 @@ def suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_colli
         print('temps', sommation)
         
         pos_précédente.append(apos[num])
-    return sommation
+    return sommation, pos_précédente
 
 def follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision, liste_distance_entre_collision,liste_distance_x_entre_collision,liste_distance_y_entre_collision,liste_distance_z_entre_collision, n_particle=0, iterations_since_last_col=0):
     """
@@ -189,7 +190,7 @@ liste_distance_y_entre_collision = []
 liste_distance_z_entre_collision = []
 
 
-sommation = 0
+sommation = 1
 pos_précédente1 = []
 liste_temps_entre_collision1 = []
 liste_distance_entre_collision1 = []
@@ -266,7 +267,7 @@ for k in range(1000):
         apos[j] = posj+(p[j]/mass)*deltat
 
     # **Appel de la fonction suit() ici**
-    sommation = suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_collision1, liste_distance_entre_collision1, liste_distance_x_entre_collision1, liste_distance_y_entre_collision1, liste_distance_z_entre_collision1)
+    sommation, pos_précédente = suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_collision1, liste_distance_entre_collision1, liste_distance_x_entre_collision1, liste_distance_y_entre_collision1, liste_distance_z_entre_collision1)
     iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
     print('*********************')
 np.savetxt("PHY-3003/data.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
