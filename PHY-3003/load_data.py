@@ -1,31 +1,36 @@
+from vpython import *
 import numpy as np
+import math
+import matplotlib.pyplot as plt
+import pickle
+print(path_object)
+data = np.loadtxt("/Users/xavierboucher/Desktop/Laboratoires/PHY-3003/data.txt")
 
-data = np.loadtxt("data.txt")
+temps_entre_collision = data[:,0]
+distance_entre_collision = data[:,1]
+distance_x_entre_collision = data[:,2]
+distance_y_entre_collision = data[:,3]
+distance_z_entre_collision = data[:,4]
 
-liste_temps_entre_collision = data[:,0]
-liste_distance_entre_collision = data[:,1]
-liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision = data[:,2], data[:,3],data[:,4]
-print('temps moyen',np.mean(liste_temps_entre_collision))
-print('distance moyenne',np.mean(liste_distance_entre_collision))
-
-
-liste_vitesse_entre_collision = liste_distance_entre_collision/liste_temps_entre_collision
-
-
-print('vitesse moyenne', np.mean(liste_vitesse_entre_collision))
-
-
-
-
-liste_vx_entre_collision = liste_distance_x_entre_collision/liste_temps_entre_collision
-liste_vy_entre_collision = liste_distance_y_entre_collision/liste_temps_entre_collision
-liste_vz_entre_collision = liste_distance_z_entre_collision/liste_temps_entre_collision
+vitesse_moyenne = vector(np.sum(distance_x_entre_collision),np.sum(distance_y_entre_collision),np.sum(distance_z_entre_collision))/np.sum(temps_entre_collision)
+print("MOI:")
+print(f"Vitesse moyenne: {vitesse_moyenne} m/s")
+print(f"Vitesse moyenne scalaire: {np.sum(distance_entre_collision)/np.sum(temps_entre_collision)} m/s")
+print(f"Vitesse moyenne scalaire: {vitesse_moyenne.mag} m/s")
 
 
-print('vitesse en x moyenne', np.mean(liste_vx_entre_collision))
-print('vitesse en y moyenne', np.mean(liste_vy_entre_collision))
-print('vitesse en z moyenne', np.mean(liste_vz_entre_collision))
 
-vmoy=  np.sqrt(np.mean(liste_vx_entre_collision)**2+np.mean(liste_vy_entre_collision)**2+np.mean(liste_vz_entre_collision)**2)
 
-print('vitesse moyenne', (vmoy))
+data = np.loadtxt("/Users/xavierboucher/Desktop/Laboratoires/PHY-3003/data1.txt")
+
+temps_entre_collision = data[:,0]
+distance_entre_collision = data[:,1]
+distance_x_entre_collision = data[:,2]
+distance_y_entre_collision = data[:,3]
+distance_z_entre_collision = data[:,4]
+
+vitesse_moyenne = vector(np.sum(distance_x_entre_collision),np.sum(distance_y_entre_collision),np.sum(distance_z_entre_collision))/np.sum(temps_entre_collision)
+print("TOI:")
+print(f"Vitesse moyenne: {vitesse_moyenne} m/s")
+print(f"Vitesse moyenne scalaire: {np.sum(distance_entre_collision)/np.sum(temps_entre_collision)} m/s")
+print(f"Vitesse moyenne scalaire: {vitesse_moyenne.mag} m/s")

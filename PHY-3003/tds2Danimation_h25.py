@@ -88,60 +88,62 @@ def checkCollisions():
     return hitlist
 
 
-def suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision):
+
+def suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision):
     num = 0  # Indice fixe, pourrait être généralisé en fonction du cas d'utilisation
+    collision_detectée = False  # Variable pour suivre l'état de collision
 
+    # Vérification des collisions
     for paire in hitlist:
-        # Vérifie si l'indice courant (num) est l'un des éléments de la paire
         if num == paire[0] or num == paire[1]:  
-            # Ajoute le temps écoulé entre les collisions à la liste des temps
-            liste_temps_entre_collision.append(temps_entre_collision)
-            temps_entre_collision = dt  # Réinitialise le temps entre collisions
+            collision_detectée = True
+            break  # Sort de la boucle dès qu'une collision est détectée
 
-            # Initialisation des variables
-            distance = 0
-            vec_distance_x = 0
-            vec_distance_y = 0
-            vec_distance_z = 0
+    if collision_detectée==True:
+        # Ajoute le temps écoulé entre les collisions à la liste des temps
+        liste_temps_entre_collision.append(sommation*dt)
+        print('*********************')
+        print('sommation', sommation)
+        
 
-            pos_précédente.append(apos[num])  # Ajoute la position actuelle pour le calcul de la distance
+        # Initialisation des variables
+        distance = 0
+        vec_distance_x = 0
+        vec_distance_y = 0
+        vec_distance_z = 0
 
-            # Calcul des distances entre positions successives
-            for i in range(1, len(pos_précédente)):
-                # Calcul de la différence de position entre deux étapes successives
-                delta_vect = pos_précédente[i] - pos_précédente[i-1]
-                # Extraction des composantes du vecteur delta
-                delta_x, delta_y, delta_z = delta_vect.x, delta_vect.y, delta_vect.z
+        pos_précédente.append(apos[num])  # Ajoute la position actuelle pour le calcul de la distance
 
-                # Incrémentation des distances composantes
-                vec_distance_x += np.abs(delta_x)
-                vec_distance_y += np.abs(delta_y)
-                vec_distance_z += np.abs(delta_z)
+        # Calcul des distances entre positions successives
+        for i in range(1, len(pos_précédente)):
+            delta_vect = pos_précédente[i] - pos_précédente[i - 1]
+            delta_x, delta_y, delta_z = delta_vect.x, delta_vect.y, delta_vect.z
 
-                # Calcul de la distance parcourue entre les deux positions
-                distance_parcourue = np.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
+            vec_distance_x += np.abs(delta_x)
+            vec_distance_y += np.abs(delta_y)
+            vec_distance_z += np.abs(delta_z)
 
-                # Additionne la distance parcourue
-                distance += distance_parcourue
+            distance_parcourue = np.sqrt(delta_x ** 2 + delta_y ** 2 + delta_z ** 2)
+            distance += distance_parcourue
 
-            # Sauvegarde du vecteur de distance total entre les collisions
-            
-            liste_distance_x_entre_collision.append(vec_distance_x)
-            liste_distance_y_entre_collision.append(vec_distance_y)
-            liste_distance_z_entre_collision.append(vec_distance_z)
+        # Sauvegarde des distances entre collisions
+        liste_distance_x_entre_collision.append(vec_distance_x)
+        liste_distance_y_entre_collision.append(vec_distance_y)
+        liste_distance_z_entre_collision.append(vec_distance_z)
+        liste_distance_entre_collision.append(distance)
 
-            # Ajoute la distance totale parcourue entre les collisions à la liste
-            liste_distance_entre_collision.append(distance)
+        # Remise à zéro de la liste des positions, mais en gardant la dernière position
+        pos_précédente.clear()
+        pos_précédente.append(apos[num])
+        sommation = 1
 
-            # Remise à zéro de la liste des positions, mais en gardant la dernière position
-            pos_précédente.clear()  
-            pos_précédente.append(apos[num])  # Ajoute la dernière position après le clear
-
-        else:
-            # Si aucune collision n'est détectée, met à jour le temps entre collisions et ajoute la position actuelle à la liste
-            temps_entre_collision += dt
-            pos_précédente.append(apos[num])  # Ajout de la position actuelle sous forme de tableau NumPy
-
+    if collision_detectée==False:
+        # Si aucune collision n'est détectée, met à jour le temps entre collisions et ajoute la position actuelle à la liste
+        sommation += 1
+        print('temps', sommation)
+        
+        pos_précédente.append(apos[num])
+    return sommation
 
 def follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision, liste_distance_entre_collision,liste_distance_x_entre_collision,liste_distance_y_entre_collision,liste_distance_z_entre_collision, n_particle=0, iterations_since_last_col=0):
     """
@@ -166,6 +168,7 @@ def follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision, list
             #coliisions.append([i,j])
     if particle_hit:
         #print(iterations_since_last_col, coliisions, deltapos)
+        print('iterations_since_last_col', iterations_since_last_col)
         liste_temps_entre_collision.append(iterations_since_last_col*dt)
         liste_distance_entre_collision.append(deltapos.mag)
         liste_distance_x_entre_collision.append(np.abs(deltapos.x))
@@ -186,9 +189,19 @@ liste_distance_y_entre_collision = []
 liste_distance_z_entre_collision = []
 
 
+sommation = 0
+pos_précédente1 = []
+liste_temps_entre_collision1 = []
+liste_distance_entre_collision1 = []
+liste_distance_x_entre_collision1 = []
+liste_distance_y_entre_collision1 = []
+liste_distance_z_entre_collision1 = []
+
 iterations_since_last_col = 0
 deltapos = vector(0,0,0)
 for k in range(1000):
+
+    
     rate(300)  # limite la vitesse de calcul de la simulation pour que l'animation soit visible à l'oeil humain!
 
     #### DÉPLACE TOUTES LES SPHÈRES D'UN PAS SPATIAL deltax
@@ -251,11 +264,12 @@ for k in range(1000):
         p[j] = pcomj+mass*Vcom
         apos[i] = posi+(p[i]/mass)*deltat # move forward deltat in time, ramenant au même temps où sont rendues les autres sphères dans l'itération
         apos[j] = posj+(p[j]/mass)*deltat
-    # **Appel de la fonction suit() ici**
-    #suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision)
-    iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
 
+    # **Appel de la fonction suit() ici**
+    sommation = suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_collision1, liste_distance_entre_collision1, liste_distance_x_entre_collision1, liste_distance_y_entre_collision1, liste_distance_z_entre_collision1)
+    iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
+    print('*********************')
 np.savetxt("PHY-3003/data.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
-pickle.dump(p, open("PHY-3003/qte_mvt.pkl", "wb"))
-#print(p)
-print('temps moyen',(liste_temps_entre_collision))
+
+np.savetxt("PHY-3003/data1.txt", np.array([liste_temps_entre_collision1,liste_distance_entre_collision1, liste_distance_x_entre_collision1, liste_distance_y_entre_collision1, liste_distance_z_entre_collision1]).T)
+
