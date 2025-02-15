@@ -67,6 +67,11 @@ for i in range(Natoms):
     pz = 0
     p.append(vector(px,py,pz)) # liste de la quantité de mouvement initiale de toutes les sphères
 
+initialization = pickle.load(open("PHY-3003/init.pkl", "rb"))
+apos,p = initialization[0], initialization[1]
+#initialization = (apos,p)
+#pickle.dump(initialization, open("PHY-3003/init.pkl", "wb"))
+
 #### FONCTION POUR IDENTIFIER LES COLLISIONS, I.E. LORSQUE LA DISTANCE ENTRE LES CENTRES DE 2 SPHÈRES EST À LA LIMITE DE S'INTERPÉNÉTRER ####
 def checkCollisions():
     hitlist = []   # initialisation
@@ -84,7 +89,7 @@ def checkCollisions():
 
 
 def suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision):
-    num = 69  # Indice fixe, pourrait être généralisé en fonction du cas d'utilisation
+    num = 0  # Indice fixe, pourrait être généralisé en fonction du cas d'utilisation
 
     for paire in hitlist:
         # Vérifie si l'indice courant (num) est l'un des éléments de la paire
@@ -109,9 +114,9 @@ def suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps
                 delta_x, delta_y, delta_z = delta_vect.x, delta_vect.y, delta_vect.z
 
                 # Incrémentation des distances composantes
-                vec_distance_x += delta_x
-                vec_distance_y += delta_y
-                vec_distance_z += delta_z
+                vec_distance_x += np.abs(delta_x)
+                vec_distance_y += np.abs(delta_y)
+                vec_distance_z += np.abs(delta_z)
 
                 # Calcul de la distance parcourue entre les deux positions
                 distance_parcourue = np.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
@@ -137,11 +142,37 @@ def suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps
             temps_entre_collision += dt
             pos_précédente.append(apos[num])  # Ajout de la position actuelle sous forme de tableau NumPy
 
-def follow_particle(n_particle=0):
+
+def follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision, liste_distance_entre_collision,liste_distance_x_entre_collision,liste_distance_y_entre_collision,liste_distance_z_entre_collision, n_particle=0, iterations_since_last_col=0):
     """
     n_particle: indice de la particule à suivre
+    iterations_since_last_col: nombre d'itérations depuis que la particule a subit une collision
+    liste_temps_entre_collision: liste de temps entre les collisions
+    liste_distance_entre_collision: liste des distances entre les collisions
+    liste_distance_x_entre_collision: liste des distances x entre les collisions
+    liste_distance_y_entre_collision: liste des distances y entre les collisions
+    liste_distance_z_entre_collision: liste des distances z entre les collisions
     """
-    pass
+    iterations_since_last_col += 1
+    deltapos.x += np.abs(deltax[n_particle].x)
+    deltapos.y += np.abs(deltax[n_particle].y)
+    deltapos.z += np.abs(deltax[n_particle].z)
+    particle_hit = False
+    #coliisions = []
+    for ij in hitlist:
+        i,j = ij[0], ij[1]
+        if i == n_particle or j == n_particle:
+            particle_hit = True
+            #coliisions.append([i,j])
+    if particle_hit:
+        #print(iterations_since_last_col, coliisions, deltapos)
+        liste_temps_entre_collision.append(iterations_since_last_col*dt)
+        liste_distance_entre_collision.append(deltapos.mag)
+        liste_distance_x_entre_collision.append(np.abs(deltapos.x))
+        liste_distance_y_entre_collision.append(np.abs(deltapos.y))
+        liste_distance_z_entre_collision.append(np.abs(deltapos.z))
+        return 0, vector(0,0,0)
+    return iterations_since_last_col, deltapos
 
 #### BOUCLE PRINCIPALE POUR L'ÉVOLUTION TEMPORELLE DE PAS dt ####
 ## ATTENTION : la boucle laisse aller l'animation aussi longtemps que souhaité, assurez-vous de savoir comment interrompre vous-même correctement (souvent `ctrl+c`, mais peut varier)
@@ -153,6 +184,10 @@ liste_distance_entre_collision = []
 liste_distance_x_entre_collision = []
 liste_distance_y_entre_collision = []
 liste_distance_z_entre_collision = []
+
+
+iterations_since_last_col = 0
+deltapos = vector(0,0,0)
 for k in range(1000):
     rate(300)  # limite la vitesse de calcul de la simulation pour que l'animation soit visible à l'oeil humain!
 
@@ -162,8 +197,7 @@ for k in range(1000):
     for i in range(Natoms):
         vitesse.append(p[i]/mass)   # par définition de la quantité de nouvement pour chaque sphère
         deltax.append(vitesse[i] * dt)   # différence avant pour calculer l'incrément de position
-        print(deltax[i])
-        input("")
+
         Atoms[i].pos = apos[i] = apos[i] + deltax[i]  # nouvelle position de l'atome après l'incrément de temps dt
 
     #### CONSERVE LA QUANTITÉ DE MOUVEMENT AUX COLLISIONS AVEC LES MURS DE LA BOÎTE ####
@@ -178,7 +212,6 @@ for k in range(1000):
 
     #### LET'S FIND THESE COLLISIONS!!! ####
     hitlist = checkCollisions()
-
     #### CONSERVE LA QUANTITÉ DE MOUVEMENT AUX COLLISIONS ENTRE SPHÈRES ####
     for ij in hitlist:
 
@@ -218,10 +251,11 @@ for k in range(1000):
         p[j] = pcomj+mass*Vcom
         apos[i] = posi+(p[i]/mass)*deltat # move forward deltat in time, ramenant au même temps où sont rendues les autres sphères dans l'itération
         apos[j] = posj+(p[j]/mass)*deltat
-            # **Appel de la fonction suit() ici**
-    suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision)
+    # **Appel de la fonction suit() ici**
+    #suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision)
+    iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
 
-np.savetxt("data.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
-pickle.dump(p, open("qte_mvt.pkl", "wb"))
+np.savetxt("PHY-3003/data.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
+pickle.dump(p, open("PHY-3003/qte_mvt.pkl", "wb"))
 #print(p)
 print('temps moyen',(liste_temps_entre_collision))
