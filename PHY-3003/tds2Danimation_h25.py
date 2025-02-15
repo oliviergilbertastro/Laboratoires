@@ -14,6 +14,7 @@ from vpython import *
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import pickle
 
 # win = 500 # peut aider à définir la taille d'un autre objet visuel comme un histogramme proportionnellement à la taille du canevas.
 
@@ -82,9 +83,6 @@ def checkCollisions():
     return hitlist
 
 
-
-import numpy as np
-
 def suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision):
     num = 69  # Indice fixe, pourrait être généralisé en fonction du cas d'utilisation
 
@@ -102,7 +100,6 @@ def suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps
             vec_distance_z = 0
 
             pos_précédente.append(apos[num])  # Ajoute la position actuelle pour le calcul de la distance
-            print('vect', pos_précédente)
 
             # Calcul des distances entre positions successives
             for i in range(1, len(pos_précédente)):
@@ -140,6 +137,11 @@ def suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps
             temps_entre_collision += dt
             pos_précédente.append(apos[num])  # Ajout de la position actuelle sous forme de tableau NumPy
 
+def follow_particle(n_particle=0):
+    """
+    n_particle: indice de la particule à suivre
+    """
+    pass
 
 #### BOUCLE PRINCIPALE POUR L'ÉVOLUTION TEMPORELLE DE PAS dt ####
 ## ATTENTION : la boucle laisse aller l'animation aussi longtemps que souhaité, assurez-vous de savoir comment interrompre vous-même correctement (souvent `ctrl+c`, mais peut varier)
@@ -160,6 +162,8 @@ for k in range(1000):
     for i in range(Natoms):
         vitesse.append(p[i]/mass)   # par définition de la quantité de nouvement pour chaque sphère
         deltax.append(vitesse[i] * dt)   # différence avant pour calculer l'incrément de position
+        print(deltax[i])
+        input("")
         Atoms[i].pos = apos[i] = apos[i] + deltax[i]  # nouvelle position de l'atome après l'incrément de temps dt
 
     #### CONSERVE LA QUANTITÉ DE MOUVEMENT AUX COLLISIONS AVEC LES MURS DE LA BOÎTE ####
@@ -218,6 +222,6 @@ for k in range(1000):
     suit(hitlist, dt, temps_entre_collision, pos_précédente, apos, liste_temps_entre_collision, liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision)
 
 np.savetxt("data.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
-
+pickle.dump(p, open("qte_mvt.pkl", "wb"))
 #print(p)
 print('temps moyen',(liste_temps_entre_collision))
