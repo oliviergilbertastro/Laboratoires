@@ -67,8 +67,8 @@ for i in range(Natoms):
     pz = 0
     p.append(vector(px,py,pz)) # liste de la quantité de mouvement initiale de toutes les sphères
 
-initialization = pickle.load(open("PHY-3003/init.pkl", "rb"))
-apos,p = initialization[0], initialization[1]
+#initialization = pickle.load(open("PHY-3003/init.pkl", "rb"))
+#apos,p = initialization[0], initialization[1]
 #initialization = (apos,p)
 #pickle.dump(initialization, open("PHY-3003/init.pkl", "wb"))
 
@@ -102,8 +102,8 @@ def suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_colli
     if collision_detectée==True:
         # Ajoute le temps écoulé entre les collisions à la liste des temps
         liste_temps_entre_collision.append(sommation*dt)
-        print('*********************')
-        print('sommation', sommation)
+        #print('*********************')
+        #print('sommation', sommation)
         
 
         # Initialisation des variables
@@ -135,13 +135,13 @@ def suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_colli
         # Remise à zéro de la liste des positions, mais en gardant la dernière position
         pos_précédente.clear()
         pos_précédente.append(apos[num])
-        print('pos_précédente', pos_précédente)
+        #('pos_précédente', pos_précédente)
         sommation = 1
 
     if collision_detectée==False:
         # Si aucune collision n'est détectée, met à jour le temps entre collisions et ajoute la position actuelle à la liste
         sommation += 1
-        print('temps', sommation)
+        #print('temps', sommation)
         
         pos_précédente.append(apos[num])
     return sommation, pos_précédente
@@ -168,8 +168,6 @@ def follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision, list
             particle_hit = True
             #coliisions.append([i,j])
     if particle_hit:
-        #print(iterations_since_last_col, coliisions, deltapos)
-        print('iterations_since_last_col', iterations_since_last_col)
         liste_temps_entre_collision.append(iterations_since_last_col*dt)
         liste_distance_entre_collision.append(deltapos.mag)
         liste_distance_x_entre_collision.append(np.abs(deltapos.x))
@@ -200,7 +198,7 @@ liste_distance_z_entre_collision1 = []
 
 iterations_since_last_col = 0
 deltapos = vector(0,0,0)
-for k in range(1000):
+for k in range(10000):
 
     
     rate(300)  # limite la vitesse de calcul de la simulation pour que l'animation soit visible à l'oeil humain!
@@ -269,7 +267,6 @@ for k in range(1000):
     # **Appel de la fonction suit() ici**
     sommation, pos_précédente = suit(hitlist, dt, sommation, pos_précédente, apos, liste_temps_entre_collision1, liste_distance_entre_collision1, liste_distance_x_entre_collision1, liste_distance_y_entre_collision1, liste_distance_z_entre_collision1)
     iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
-    print('*********************')
 np.savetxt("PHY-3003/data.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
 
 np.savetxt("PHY-3003/data1.txt", np.array([liste_temps_entre_collision1,liste_distance_entre_collision1, liste_distance_x_entre_collision1, liste_distance_y_entre_collision1, liste_distance_z_entre_collision1]).T)
