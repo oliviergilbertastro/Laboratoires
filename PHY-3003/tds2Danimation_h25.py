@@ -198,7 +198,8 @@ liste_distance_z_entre_collision1 = []
 
 iterations_since_last_col = 0
 deltapos = vector(0,0,0)
-for k in range(10000):
+from tqdm import tqdm
+for k in tqdm(range(100000)):
 
     
     rate(300)  # limite la vitesse de calcul de la simulation pour que l'animation soit visible à l'oeil humain!
