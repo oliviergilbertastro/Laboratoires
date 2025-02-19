@@ -90,6 +90,11 @@ if Ncores != realNcores:
     print(f"Could not place {Ncores} cores periodically, placed {realNcores} instead!")
 Ncores = realNcores
 
+### CALCULATE TAU, THE RELAXATION/COLLISION TIME ###
+avg_space_between_cores = L/sides # approximation
+avg_velocity = pavg/mass
+tau_time = avg_space_between_cores/avg_velocity
+
 #initialization = pickle.load(open("PHY-3003/init.pkl", "rb"))
 #apos,p = initialization[0], initialization[1]
 #initialization = (apos,p)
@@ -221,7 +226,7 @@ for k in tqdm(range(100000)):
         rrel = hat(rrel)    # vecteur unitaire aligné avec rrel
         p[i] = p[i]-2*dot(p[i],rrel)*rrel # bounce in center-of-momentum (com) frame
         
-        p[i] = p[i]*0.9 # collision inélastique
+        p[i] = p[i]*np.exp(-deltat/tau_time) # collision inélastique
 
         apos[i] = posi+(p[i]/mass)*deltat # move forward deltat in time, ramenant au même temps où sont rendues les autres sphères dans l'itération
 
