@@ -74,15 +74,21 @@ for i in range(Nelectrons):
 
 ### ON INITIALISE LES COEURS IONIQUES STATIQUES ###
 sides = int(np.sqrt(Ncores))
+realNcores = 0
 for i in range(sides):
     for k in range(sides):
+        realNcores += 1
         x = ((i+0.5)/sides)*L-L/2 # position fixe environ équidistante, mais surtout périodique
         y = ((k+0.5)/sides)*L-L/2
         z = 0
         Spheres.append(simple_sphere(pos=vector(x,y,z), radius=Rcore, color=red))
         apos.append(vec(x,y,z)) # liste de la position initiale de toutes les sphères
         p.append(vector(0,0,0)) # liste de la quantité de mouvement initiale de toutes les sphères
-
+if sides*Rcore*2 >= L:
+    raise ValueError("The cores are touching.")
+if Ncores != realNcores:
+    print(f"Could not place {Ncores} cores periodically, placed {realNcores} instead!")
+Ncores = realNcores
 
 #initialization = pickle.load(open("PHY-3003/init.pkl", "rb"))
 #apos,p = initialization[0], initialization[1]
@@ -192,15 +198,12 @@ for k in tqdm(range(100000)):
         # définition de nouvelles variables pour chaque paire de sphères en collision
         i = ij[0]  # extraction du numéro des 2 sphères impliquées à cette itération
         j = ij[1]
-        ptot = p[i]+p[j]   # quantité de mouvement totale des 2 sphères
-        mtot = 200*mass    # masse totale des 2 sphères
-        Vcom =  p[j]/mass  # vitesse du référentiel barycentrique/center-of-momentum (com) frame
         posi = apos[i]   # position de chacune des 2 sphères
         posj = apos[j]
         vi = p[i]/mass   # vitesse de chacune des 2 sphères
         vj = p[j]/mass
         rrel = posi-posj  # vecteur pour la distance entre les centres des 2 sphères
-        vrel = vj-vi   # vecteur pour la différence de vitesse entre les 2 sphères
+        vrel = -vi   # vecteur pour la différence de vitesse entre les 2 sphères
 
         # exclusion de cas où il n'y a pas de changements à faire
         if vrel.mag2 == 0: continue  # exactly same velocities si et seulement si le vecteur vrel devient nul, la trajectoire des 2 sphères continue alors côte à côte
@@ -215,10 +218,11 @@ for k in tqdm(range(100000)):
 
         #### CHANGE L'INTERPÉNÉTRATION DES SPHÈRES PAR LA CINÉTIQUE DE COLLISION ####
         posi = posi-vi*deltat   # back up to contact configuration
-        pcomi = p[i]-mass*Vcom  # transform momenta to center-of-momentum (com) frame
         rrel = hat(rrel)    # vecteur unitaire aligné avec rrel
-        pcomi = pcomi-2*dot(pcomi,rrel)*rrel # bounce in center-of-momentum (com) frame
-        p[i] = pcomi+mass*Vcom # transform momenta back to lab frame
+        p[i] = p[i]-2*dot(p[i],rrel)*rrel # bounce in center-of-momentum (com) frame
+        
+        p[i] = p[i]*0.9 # collision inélastique
+
         apos[i] = posi+(p[i]/mass)*deltat # move forward deltat in time, ramenant au même temps où sont rendues les autres sphères dans l'itération
 
     # **Appel de la fonction suit() ici**
