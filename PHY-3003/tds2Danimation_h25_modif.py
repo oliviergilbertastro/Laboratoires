@@ -94,6 +94,8 @@ Ncores = realNcores
 avg_space_between_cores = L/sides # approximation
 avg_velocity = pavg/mass
 tau_time = avg_space_between_cores/avg_velocity
+print(tau_time)
+tau_time = 6.881957897455725E-7
 
 #initialization = pickle.load(open("PHY-3003/init.pkl", "rb"))
 #apos,p = initialization[0], initialization[1]
@@ -116,7 +118,7 @@ def checkCollisions():
     return hitlist
 
 
-def follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision, liste_distance_entre_collision,liste_distance_x_entre_collision,liste_distance_y_entre_collision,liste_distance_z_entre_collision, n_particle=0, iterations_since_last_col=0):
+def follow_particle(deltax, hitlist, deltapos, liste_p, liste_temps_entre_collision, liste_distance_entre_collision,liste_distance_x_entre_collision,liste_distance_y_entre_collision,liste_distance_z_entre_collision, n_particle=0, iterations_since_last_col=0):
     """
     n_particle: indice de la particule à suivre
     iterations_since_last_col: nombre d'itérations depuis que la particule a subit une collision
@@ -137,6 +139,7 @@ def follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision, list
         if i == n_particle or j == n_particle:
             particle_hit = True
             #coliisions.append([i,j])
+    liste_p.append(p[n_particle].mag)
     if particle_hit:
         liste_temps_entre_collision.append(iterations_since_last_col*dt)
         liste_distance_entre_collision.append(deltapos.mag)
@@ -156,20 +159,22 @@ liste_distance_entre_collision = []
 liste_distance_x_entre_collision = []
 liste_distance_y_entre_collision = []
 liste_distance_z_entre_collision = []
-
-
-sommation = 1
-pos_précédente1 = []
-liste_temps_entre_collision1 = []
-liste_distance_entre_collision1 = []
-liste_distance_x_entre_collision1 = []
-liste_distance_y_entre_collision1 = []
-liste_distance_z_entre_collision1 = []
+liste_p = []
 
 iterations_since_last_col = 0
 deltapos = vector(0,0,0)
 from tqdm import tqdm
-for k in tqdm(range(100000)):
+p_avg_list = []
+liste_temps = []
+tau_list = [] # même chose tout le temps, mais plus simple de faire une liste pour l'enregistrer
+
+try:
+    liste_tous_les_temps_collision = list(np.loadtxt("PHY-3003/data_tau_pt2.txt"))
+except:
+    liste_tous_les_temps_collision = []
+temps_collision_particule = np.array([0 for i in range(Nelectrons)], dtype=float)
+
+for k in tqdm(range(2000)):
 
     
     rate(300)  # limite la vitesse de calcul de la simulation pour que l'animation soit visible à l'oeil humain!
@@ -177,6 +182,7 @@ for k in tqdm(range(100000)):
     #### DÉPLACE TOUTES LES SPHÈRES D'UN PAS SPATIAL deltax
     vitesse = []   # vitesse instantanée de chaque sphère
     deltax = []  # pas de position de chaque sphère correspondant à l'incrément de temps dt
+    temps_collision_particule += dt
     for i in range(Nelectrons):
         vitesse.append(p[i]/mass)   # par définition de la quantité de nouvement pour chaque sphère
         deltax.append(vitesse[i] * dt)   # différence avant pour calculer l'incrément de position
@@ -199,6 +205,8 @@ for k in tqdm(range(100000)):
     #input()
     #### CONSERVE LA QUANTITÉ DE MOUVEMENT AUX COLLISIONS ENTRE SPHÈRES ####
     for ij in hitlist:
+        liste_tous_les_temps_collision.append(temps_collision_particule[i])
+        temps_collision_particule[i] = 0
 
         # définition de nouvelles variables pour chaque paire de sphères en collision
         i = ij[0]  # extraction du numéro des 2 sphères impliquées à cette itération
@@ -229,7 +237,11 @@ for k in tqdm(range(100000)):
         p[i] = p[i]*np.exp(-deltat/tau_time) # collision inélastique
 
         apos[i] = posi+(p[i]/mass)*deltat # move forward deltat in time, ramenant au même temps où sont rendues les autres sphères dans l'itération
-
+    p_avg_list.append(np.mean([p[i].mag for i in range(Nelectrons)]))
+    liste_temps.append(dt*k)
+    tau_list.append(tau_time)
     # **Appel de la fonction suit() ici**
-    iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
+    iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_p, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
 np.savetxt("PHY-3003/data_pt2.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
+np.savetxt("PHY-3003/data_p_pt2.txt", np.array([liste_temps, tau_list, liste_p, p_avg_list]).T)
+np.savetxt("PHY-3003/data_tau_pt2.txt", np.array([liste_tous_les_temps_collision]).T)
