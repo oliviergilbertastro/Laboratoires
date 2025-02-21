@@ -20,8 +20,8 @@ from scipy.stats import maxwell, norm
 # win = 500 # peut aider à définir la taille d'un autre objet visuel comme un histogramme proportionnellement à la taille du canevas.
 
 # Déclaration de variables influençant le temps d'exécution de la simulation
-Nelectrons = 500  # change this to have more or fewer electrons
-Ncores = 25  # change this to have more or fewer cores
+Nelectrons = 5000  # change this to have more or fewer electrons
+Ncores = 25  # change this to have more or fewer static ionic cores
 dt = 2E-8  # pas d'incrémentation temporel (plus petit pour les électrons)
 
 # Déclaration de variables physiques "Typical values"
