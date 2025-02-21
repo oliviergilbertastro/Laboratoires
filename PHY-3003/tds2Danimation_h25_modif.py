@@ -15,20 +15,22 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import pickle
+from scipy.stats import maxwell, norm
 
 # win = 500 # peut aider à définir la taille d'un autre objet visuel comme un histogramme proportionnellement à la taille du canevas.
 
 # Déclaration de variables influençant le temps d'exécution de la simulation
-Nelectrons = 200  # change this to have more or fewer electrons
-Ncores = 9  # change this to have more or fewer cores
+Nelectrons = 500  # change this to have more or fewer electrons
+Ncores = 25  # change this to have more or fewer cores
 dt = 2E-8  # pas d'incrémentation temporel (plus petit pour les électrons)
 
 # Déclaration de variables physiques "Typical values"
 DIM = 2 #Nombre de degrés de liberté de la simulation 
 mass = 9.1E-31 # electron mass
-Relectron = 0.01 # wildly exaggerated size of an electron
+Relectron = 0.01*0.001 # wildly exaggerated size of an electron
 Rcore = 0.04 # wildly exaggerated size of a static core
 k = 1.4E-23 # Boltzmann constant
+k_Boltzmann = 1.4E-23 # Boltzmann constant
 T = 300 # around room temperature
 
 #### CANEVAS DE FOND ####
@@ -62,12 +64,20 @@ for i in range(Nelectrons):
     z = 0
     if i == 0:  # garde une sphère plus grosse et colorée parmis toutes les grises
         Spheres.append(simple_sphere(pos=vector(x,y,z), radius=0.03, color=color.magenta)) #, make_trail=True, retain=100, trail_radius=0.3*Ratom))
-    else: Spheres.append(simple_sphere(pos=vector(x,y,z), radius=Relectron, color=blue))
+    else: Spheres.append(simple_sphere(pos=vector(x,y,z), radius=Relectron*1000, color=blue))
     apos.append(vec(x,y,z)) # liste de la position initiale de toutes les sphères
+
+    # ON UTILISE UNE QTE DE MOUVEMENT DISTRIBUÉE SELON MAXWELL-BOLTZMANN AU LIEU DE L'ÉQUIPARTITION
+    v_moy = pavg/mass
+    E_moy = np.mean(v_moy**2)*1/2*mass
+    E_tot = E_moy*Nelectrons
+    Temperature = 2*E_moy/k_Boltzmann/DIM
+    p_ini = maxwell.rvs(scale=(k_Boltzmann*Temperature/mass)**0.5, size=1)*mass
+
 #    theta = pi*random() # direction de coordonnées sphériques, superflue en 2D
     phi = 2*pi*random() # direction aléatoire pour la quantité de mouvement
-    px = pavg*cos(phi)  # qte de mvt initiale selon l'équipartition
-    py = pavg*sin(phi)
+    px = p_ini*cos(phi)  # qte de mvt initiale selon l'équipartition
+    py = p_ini*sin(phi)
     pz = 0
     p.append(vector(px,py,pz)) # liste de la quantité de mouvement initiale de toutes les sphères
 
@@ -94,8 +104,6 @@ Ncores = realNcores
 avg_space_between_cores = L/sides # approximation
 avg_velocity = pavg/mass
 tau_time = avg_space_between_cores/avg_velocity
-print(tau_time)
-tau_time = 6.881957897455725E-7
 
 #initialization = pickle.load(open("PHY-3003/init.pkl", "rb"))
 #apos,p = initialization[0], initialization[1]
@@ -118,7 +126,7 @@ def checkCollisions():
     return hitlist
 
 
-def follow_particle(deltax, hitlist, deltapos, liste_p, liste_temps_entre_collision, liste_distance_entre_collision,liste_distance_x_entre_collision,liste_distance_y_entre_collision,liste_distance_z_entre_collision, n_particle=0, iterations_since_last_col=0):
+def follow_particle(deltax, hitlist, deltapos, liste_p, p, liste_temps_entre_collision, liste_distance_entre_collision,liste_distance_x_entre_collision,liste_distance_y_entre_collision,liste_distance_z_entre_collision, n_particle=0, iterations_since_last_col=0):
     """
     n_particle: indice de la particule à suivre
     iterations_since_last_col: nombre d'itérations depuis que la particule a subit une collision
@@ -174,7 +182,7 @@ except:
     liste_tous_les_temps_collision = []
 temps_collision_particule = np.array([0 for i in range(Nelectrons)], dtype=float)
 
-for k in tqdm(range(2000)):
+for k in tqdm(range(5000)):
 
     
     rate(300)  # limite la vitesse de calcul de la simulation pour que l'animation soit visible à l'oeil humain!
@@ -198,6 +206,18 @@ for k in tqdm(range(2000)):
         if abs(loc.y) > L/2:
             if loc.y < 0: p[i].y = abs(p[i].y)  # renverse composante y au mur du bas
             else: p[i].y =  -abs(p[i].y)  # renverse composante y au mur du haut
+
+    # Calcule l'énergie totale:
+    v_moy = np.mean(np.array([vitesse[i].mag for i in range(Nelectrons)]))
+    E_moy = np.mean(v_moy**2)*1/2*mass
+    E_tot = E_moy*Nelectrons
+    Temperature = 2*E_moy/k_Boltzmann/DIM
+    print(v_moy)
+    print(E_moy, E_tot, Temperature)
+    x = np.linspace(0, 200000, 1000)
+    print((k_Boltzmann*Temperature/mass)**0.5)
+    #plt.plot(x, maxwell.pdf(x,scale=(k_Boltzmann*Temperature/mass)**0.5)**2*mass/k_Boltzmann/DIM)
+    #plt.show()
 
     #### LET'S FIND THESE COLLISIONS!!! ####
     hitlist = checkCollisions()
@@ -231,17 +251,35 @@ for k in tqdm(range(2000)):
 
         #### CHANGE L'INTERPÉNÉTRATION DES SPHÈRES PAR LA CINÉTIQUE DE COLLISION ####
         posi = posi-vi*deltat   # back up to contact configuration
-        rrel = hat(rrel)    # vecteur unitaire aligné avec rrel
+
+
+        # On sample aléatoirement la vitesse d'une distribution de Maxwell-Boltzmann à température T
+        #p_sampled = norm.rvs(scale=(k_Boltzmann*Temperature/mass)**0.5, size=1)*mass
+        p_sampled = maxwell.rvs(scale=(k_Boltzmann*Temperature/mass)**0.5, size=1)*mass
+
+
+        #rrel = hat(rrel)
+        #p[i] = (p[i]-2*dot(p[i],rrel)*rrel)
+        #p[i] = (p[i]/p[i].mag*p_sampled)[0] # bounce in center-of-momentum (com) frame
+
+        #print(p[i])
+        phi = 2*pi*random() # direction aléatoire pour la quantité de mouvement
+        px = p_sampled*cos(phi)  # qte de mvt initiale selon l'équipartition
+        py = p_sampled*sin(phi)
+        pz = 0
+        p[i] = vector(px,py,pz)
+
+        """ rrel = hat(rrel)    # vecteur unitaire aligné avec rrel
         p[i] = p[i]-2*dot(p[i],rrel)*rrel # bounce in center-of-momentum (com) frame
-        
-        p[i] = p[i]*np.exp(-deltat/tau_time) # collision inélastique
+        p[i] = p[i]*np.exp(-deltat/tau_time) # collision inélastique """
 
         apos[i] = posi+(p[i]/mass)*deltat # move forward deltat in time, ramenant au même temps où sont rendues les autres sphères dans l'itération
     p_avg_list.append(np.mean([p[i].mag for i in range(Nelectrons)]))
     liste_temps.append(dt*k)
     tau_list.append(tau_time)
     # **Appel de la fonction suit() ici**
-    iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_p, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
+    iterations_since_last_col, deltapos = follow_particle(deltax, hitlist, deltapos, liste_p, p, liste_temps_entre_collision,liste_distance_entre_collision,liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision,n_particle=0, iterations_since_last_col=iterations_since_last_col)
 np.savetxt("PHY-3003/data_pt2.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
 np.savetxt("PHY-3003/data_p_pt2.txt", np.array([liste_temps, tau_list, liste_p, p_avg_list]).T)
 np.savetxt("PHY-3003/data_tau_pt2.txt", np.array([liste_tous_les_temps_collision]).T)
+plt.show()
