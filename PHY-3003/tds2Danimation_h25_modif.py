@@ -20,8 +20,8 @@ from scipy.stats import maxwell, norm
 # win = 500 # peut aider à définir la taille d'un autre objet visuel comme un histogramme proportionnellement à la taille du canevas.
 
 # Déclaration de variables influençant le temps d'exécution de la simulation
-Nelectrons = 5000  # change this to have more or fewer electrons
-Ncores = 25  # change this to have more or fewer static ionic cores
+Nelectrons = 200  # change this to have more or fewer electrons
+Ncores = 9  # change this to have more or fewer static ionic cores
 dt = 2E-8  # pas d'incrémentation temporel (plus petit pour les électrons)
 
 # Déclaration de variables physiques "Typical values"
@@ -157,18 +157,32 @@ def follow_particle(deltax, hitlist, deltapos, liste_p, p, liste_temps_entre_col
         return 0, vector(0,0,0)
     return iterations_since_last_col, deltapos
 
+
+def champs(module, orientation):
+    e = q = 1.602*10**(-19)
+    module *= e*q
+    
+    if orientation == 'x':
+        force_E = vector(module , 0, 0)
+    elif orientation == 'y':
+        force_E = vector(0, module , 0)
+    else:
+        raise ValueError("L'orientation n'est pas bonne. C'est soit 'x' ou 'y'.")
+    
+    return force_E
+
 #### BOUCLE PRINCIPALE POUR L'ÉVOLUTION TEMPORELLE DE PAS dt ####
 ## ATTENTION : la boucle laisse aller l'animation aussi longtemps que souhaité, assurez-vous de savoir comment interrompre vous-même correctement (souvent `ctrl+c`, mais peut varier)
 ## ALTERNATIVE : vous pouvez bien sûr remplacer la boucle "while" par une boucle "for" avec un nombre d'itérations suffisant pour obtenir une bonne distribution statistique à l'équilibre
 temps_entre_collision = dt
-pos_précédente = []
 liste_temps_entre_collision = []
 liste_distance_entre_collision = []
 liste_distance_x_entre_collision = []
 liste_distance_y_entre_collision = []
 liste_distance_z_entre_collision = []
 liste_p = []
-
+liste_vector_x = []
+liste_vector_y = []
 iterations_since_last_col = 0
 deltapos = vector(0,0,0)
 from tqdm import tqdm
@@ -182,7 +196,15 @@ except:
     liste_tous_les_temps_collision = []
 temps_collision_particule = np.array([0 for i in range(Nelectrons)], dtype=float)
 
-for k in tqdm(range(5000)):
+##############
+
+module = 0.05 # valeur tester à date 0.001-0.05-0.01-0.1-0.2-1
+module_champs = module*10**(12)
+
+##########
+orientation = 'x'
+force = champs(module_champs, orientation)
+for k in tqdm(range(1000)):
 
     
     rate(300)  # limite la vitesse de calcul de la simulation pour que l'animation soit visible à l'oeil humain!
@@ -192,6 +214,8 @@ for k in tqdm(range(5000)):
     deltax = []  # pas de position de chaque sphère correspondant à l'incrément de temps dt
     temps_collision_particule += dt
     for i in range(Nelectrons):
+        p[i]+=force
+
         vitesse.append(p[i]/mass)   # par définition de la quantité de nouvement pour chaque sphère
         deltax.append(vitesse[i] * dt)   # différence avant pour calculer l'incrément de position
 
@@ -212,10 +236,10 @@ for k in tqdm(range(5000)):
     E_moy = np.mean(v_moy**2)*1/2*mass
     E_tot = E_moy*Nelectrons
     Temperature = 2*E_moy/k_Boltzmann/DIM
-    print(v_moy)
-    print(E_moy, E_tot, Temperature)
+    #print(v_moy)
+    #print(E_moy, E_tot, Temperature)
     x = np.linspace(0, 200000, 1000)
-    print((k_Boltzmann*Temperature/mass)**0.5)
+    #print((k_Boltzmann*Temperature/mass)**0.5)
     #plt.plot(x, maxwell.pdf(x,scale=(k_Boltzmann*Temperature/mass)**0.5)**2*mass/k_Boltzmann/DIM)
     #plt.show()
 
@@ -275,6 +299,9 @@ for k in tqdm(range(5000)):
 
         apos[i] = posi+(p[i]/mass)*deltat # move forward deltat in time, ramenant au même temps où sont rendues les autres sphères dans l'itération
     p_avg_list.append(np.mean([p[i].mag for i in range(Nelectrons)]))
+
+    liste_vector_x.append(np.mean([apos[i].x for i in range(Nelectrons)]))
+    liste_vector_y.append(np.mean([apos[i].y for i in range(Nelectrons)]))
     liste_temps.append(dt*k)
     tau_list.append(tau_time)
     # **Appel de la fonction suit() ici**
@@ -282,4 +309,7 @@ for k in tqdm(range(5000)):
 np.savetxt("PHY-3003/data_pt2.txt", np.array([liste_temps_entre_collision,liste_distance_entre_collision, liste_distance_x_entre_collision, liste_distance_y_entre_collision, liste_distance_z_entre_collision]).T)
 np.savetxt("PHY-3003/data_p_pt2.txt", np.array([liste_temps, tau_list, liste_p, p_avg_list]).T)
 np.savetxt("PHY-3003/data_tau_pt2.txt", np.array([liste_tous_les_temps_collision]).T)
+
+np.savetxt(f"PHY-3003/data_vec_xy_with_module_{module}_{orientation}.txt", np.array([liste_temps, liste_vector_x, liste_vector_y]).T)
+
 plt.show()
