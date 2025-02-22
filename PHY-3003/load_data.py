@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # Charger les données depuis le fichier
 module = 0.05
 orientation = 'x'
-filename = f"/Users/xavierboucher/Desktop/Laboratoires/PHY-3003/data_vec_xy_with_module_{module}_{orientation}.txt"
+filename = f"PHY-3003/data_vec_xy_with_module_{module}_{orientation}.txt"
 data = np.loadtxt(filename)
 
 # Extraire les colonnes
@@ -38,7 +38,7 @@ plt.tight_layout()
 plt.show()
 
 print(path_object)
-data = np.loadtxt("/Users/xavierboucher/Desktop/Laboratoires/PHY-3003/data.txt")
+data = np.loadtxt("PHY-3003/data.txt")
 
 temps_entre_collision = data[:,0]
 distance_entre_collision = data[:,1]
@@ -55,7 +55,7 @@ print(f"Vitesse moyenne scalaire: {vitesse_moyenne.mag} m/s")
 
 
 
-data = np.loadtxt("/Users/xavierboucher/Desktop/Laboratoires/PHY-3003/data1.txt")
+data = np.loadtxt("PHY-3003/data1.txt")
 
 temps_entre_collision = data[:,0]
 distance_entre_collision = data[:,1]
