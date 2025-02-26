@@ -158,7 +158,11 @@ def follow_particle(deltax, hitlist, deltapos, liste_p, p, liste_temps_entre_col
     return iterations_since_last_col, deltapos
 
 
-def champs(module, orientation):
+def champs(module, orientation="x"):
+    """
+    module: float représentant le module du champ électrique E souhaité
+    orientation: string représentant l'orientation souhaitée du champ électrique
+    """
     e = q = 1.602*10**(-19)
     module *= e*q
     
@@ -198,7 +202,7 @@ temps_collision_particule = np.array([0 for i in range(Nelectrons)], dtype=float
 
 ##############
 
-module = 0.05 # valeur tester à date 0.001-0.05-0.01-0.1-0.2-1
+module = 0.05 # valeur testées à date 0.001-0.05-0.01-0.1-0.2-1
 module_champs = module*10**(12)
 
 ##########
