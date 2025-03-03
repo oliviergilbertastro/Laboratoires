@@ -24,6 +24,16 @@ relative_efficacity = np.array(efficacity_Si_experimental)/np.array(efficacity_C
 relative_efficacity_std = [relative_efficacity[i]*np.sqrt((efficacity_Si_experimental_std[i]/efficacity_Si_experimental[i])**2+(efficacity_CdTe_experimental_std[i]/efficacity_CdTe_experimental[i])**2) for i in range(3)]
 print(relative_efficacity, relative_efficacity_std)
 
+
+print("*********************")
+h_rel = efficacity_Si_experimental[0]/efficacity_Si_experimental[-1]
+h_std = h_rel*np.sqrt((efficacity_Si_experimental_std[0]/efficacity_Si_experimental[0])**2+(efficacity_Si_experimental_std[-1]/efficacity_Si_experimental[-1])**2)
+print(h_rel, h_std)
+h_rel = efficacity_CdTe_experimental[0]/efficacity_CdTe_experimental[-1]
+h_std = h_rel*np.sqrt((efficacity_CdTe_experimental_std[0]/efficacity_CdTe_experimental[0])**2+(efficacity_CdTe_experimental_std[-1]/efficacity_CdTe_experimental[-1])**2)
+print(h_rel, h_std)
+
+
 FWHMs = infos["FWHMs"]
 FWHM_Si = [np.mean(FWHMs["XR100CR_Si"][i]) for i in range(3)]
 FWHM_Si_std = [np.std(FWHMs["XR100CR_Si"][i]) for i in range(3)]
