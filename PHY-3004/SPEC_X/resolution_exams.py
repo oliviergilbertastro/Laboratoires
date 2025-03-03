@@ -30,11 +30,11 @@ for iteration in range(5):
     data[1] = data[1]/time_exposure[1] # count/s
 
     for n in range(len(detectors)):
-        plt.plot(data[n], label=detectors[n])
-    plt.legend()
-    plt.xlabel("Channel")
-    plt.ylabel("Counts/s")
-    plt.show()
+        plt.plot(data[n], label=detectors[n], color="black")
+        plt.legend(fontsize=14)
+        plt.xlabel("Canal", fontsize=14)
+        plt.ylabel("# de détections (counts)", fontsize=14)
+        plt.show()
 
     # Étalonnage de professionnel:
     from scipy.optimize import curve_fit
