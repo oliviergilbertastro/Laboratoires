@@ -28,7 +28,7 @@ def find_dhkl(image_number, if_plot=True):
         plt.show()
     sigma_px = 1 # incertitude sur la position des pics
     d_hkl = 1 / distances_px  * SCALE # Conversion en mètres
-    sigma_d_hkl = d_hkl*sigma_px/distances_px
+    sigma_d_hkl = d_hkl*sigma_px/distances_px # Propagation de l'incertitude
     return d_hkl, sigma_d_hkl
 
 for i in range(8,11): # trois images qu'on va utiliser
