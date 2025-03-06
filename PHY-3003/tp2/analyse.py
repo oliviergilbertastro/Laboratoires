@@ -18,7 +18,7 @@ def find_dhkl(image_number, if_plot=True):
     fft_shifted = np.abs(np.fft.fftshift(fft))
     peaks = peak_local_max(fft_shifted, min_distance=10, threshold_rel=0.07)  # Détection des pics
     center = np.array(fft_shifted.shape) // 2
-    distances_px = np.sqrt((peaks[:, 0] - center[0])**2 + (peaks[:, 1] - center[1])**2)
+    distances_px = np.sqrt((peaks[:, 0] - center[0])**2 + (peaks[:, 1] - center[1])**2) # Distances absolues dans l'espace de Fourier
     if if_plot:
         ax1 = plt.subplot(121)
         ax2 = plt.subplot(122)
