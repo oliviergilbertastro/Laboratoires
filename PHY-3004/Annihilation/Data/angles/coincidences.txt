@@ -1,7 +1,6 @@
 Angle	N_coincidences
 (deg)
 -12	599
--8	NaN
 -4	2333
 0	2759
 4	2378
