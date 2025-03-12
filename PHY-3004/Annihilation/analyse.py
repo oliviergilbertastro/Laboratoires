@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-R_DETECTOR = 5.08 #cm
+R_DETECTOR = 5.08/2 #cm
 DISTANCE_SOURCE = 13 # cm
 
 def read_spec(detecteur="fixe", deg=0):
@@ -14,8 +14,9 @@ N_coincidences = data_coincidences[:-1,1]
 N_coincidences = np.nan_to_num(N_coincidences)
 
 bkg_coincidences = data_coincidences[-1,1]
+uncertainty_coincidences = np.sqrt(N_coincidences+bkg_coincidences)
 N_coincidences -= bkg_coincidences
-uncertainty_coincidences = np.sqrt(0**2) # need to add the error from the poisson uncertainty
+uncertainty_angles = np.ones_like(angles)*0.5
 
 def A_normal_theorique(phi, ratio, offset):
     # ratio = dis_source/r_detector
@@ -31,14 +32,53 @@ def deg_to_rad(degs):
 
 from scipy.optimize import curve_fit
 # Fitting the curve to the data
-res, sigmas = curve_fit(A_normal_theorique, deg_to_rad(angles), N_coincidences/np.max(N_coincidences), p0=[DISTANCE_SOURCE/R_DETECTOR, 0])
-
+uncertainty_coincidences /= np.max(N_coincidences)
+N_coincidences /= np.max(N_coincidences)
+res, cov_matrix = curve_fit(
+    A_normal_theorique, 
+    deg_to_rad(angles), 
+    N_coincidences, 
+    sigma=uncertainty_coincidences,
+    p0=[DISTANCE_SOURCE / R_DETECTOR, 0]  # Initial guess
+)
+sigmas = np.sqrt(np.diag(cov_matrix))
 print(res, sigmas)
 angles_theo = np.linspace(-40,40,1000)
 plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), DISTANCE_SOURCE/R_DETECTOR, 0), "--", color="red", label="théorique")
-plt.errorbar(angles, N_coincidences/np.max(N_coincidences), yerr=uncertainty_coincidences/np.max(N_coincidences), fmt="o", color="black", label="données")
+plt.errorbar(angles, N_coincidences, xerr=uncertainty_angles, yerr=uncertainty_coincidences, fmt="o", color="black", label="données")
 plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), res[0], res[1]), "-", color="blue", label="fit")
-plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), 5, -0.01178981), "-", color="orange", label="manual fit")
+plt.legend()
+plt.xlabel(r"$\phi \, \mathrm{[^\circ]}$", fontsize=15)
+plt.ylabel(r"$\%$ max", fontsize=15)
+plt.show()
+
+
+
+# Mont-Carlo to trace the uncertainties on the model:
+from tqdm import tqdm
+from random import gauss
+
+def resample_array(current, current_std):
+    new = []
+    for s in range(0, len(current)):
+        if current_std[s] > 0:
+            new.append(gauss(current[s], current_std[s]))
+        else:
+            new.append(current[s])
+    return np.asarray(new)
+
+
+fits = []
+for i in tqdm(range(10000)):
+    params = resample_array(res,sigmas) # Resample the fitted parameters in their uncertainties
+    fits.append(A_normal_theorique(deg_to_rad(angles_theo), *params))
+
+plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), DISTANCE_SOURCE/R_DETECTOR, 0), "--", color="red", label="théorique")
+plt.fill_between(angles_theo, np.quantile(fits, 0.0015, axis=0), np.quantile(fits, 0.9985, axis=0), color="orange", edgecolor="none", alpha=0.2)
+plt.fill_between(angles_theo, np.quantile(fits, 0.0225, axis=0), np.quantile(fits, 0.9775, axis=0), color="orange", edgecolor="none", alpha=0.4)
+plt.fill_between(angles_theo, np.quantile(fits, 0.1585, axis=0), np.quantile(fits, 0.8415, axis=0), color="orange", edgecolor="none", alpha=0.6)
+plt.errorbar(angles, N_coincidences, xerr=uncertainty_angles, yerr=uncertainty_coincidences, fmt="o", color="black", label="données")
+plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), res[0], res[1]), "-", color="red", label="fit")
 plt.legend()
 plt.xlabel(r"$\phi \, \mathrm{[^\circ]}$", fontsize=15)
 plt.ylabel(r"$\%$ max", fontsize=15)
