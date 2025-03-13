@@ -31,7 +31,7 @@ def deg_to_rad(degs):
     return np.array(degs)*np.pi/180
 
 from scipy.optimize import curve_fit
-# Fitting the curve to the data
+# Fitting the theoretical curve to the data
 uncertainty_coincidences /= np.max(N_coincidences)
 N_coincidences /= np.max(N_coincidences)
 res, cov_matrix = curve_fit(
@@ -73,13 +73,56 @@ for i in tqdm(range(10000)):
     params = resample_array(res,sigmas) # Resample the fitted parameters in their uncertainties
     fits.append(A_normal_theorique(deg_to_rad(angles_theo), *params))
 
+ax1 = plt.subplot(111)
 plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), DISTANCE_SOURCE/R_DETECTOR, 0), "--", color="red", label="théorique")
 plt.fill_between(angles_theo, np.quantile(fits, 0.0015, axis=0), np.quantile(fits, 0.9985, axis=0), color="orange", edgecolor="none", alpha=0.2)
 plt.fill_between(angles_theo, np.quantile(fits, 0.0225, axis=0), np.quantile(fits, 0.9775, axis=0), color="orange", edgecolor="none", alpha=0.4)
 plt.fill_between(angles_theo, np.quantile(fits, 0.1585, axis=0), np.quantile(fits, 0.8415, axis=0), color="orange", edgecolor="none", alpha=0.6)
 plt.errorbar(angles, N_coincidences, xerr=uncertainty_angles, yerr=uncertainty_coincidences, fmt="o", color="black", label="données")
 plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), res[0], res[1]), "-", color="red", label="fit")
-plt.legend()
-plt.xlabel(r"$\phi \, \mathrm{[^\circ]}$", fontsize=15)
-plt.ylabel(r"$\%$ max", fontsize=15)
+plt.legend(fontsize=15)
+plt.xlabel(r"$\phi \, \mathrm{[^\circ]}$", fontsize=16)
+plt.ylabel(r"$N/N_0$", fontsize=16)
+ax1.xaxis.set_tick_params(labelsize=15)
+ax1.yaxis.set_tick_params(labelsize=15)
+plt.tight_layout()
+plt.savefig("PHY-3004/Annihilation/Figures/theoretical_fit.pdf")
+plt.show()
+
+
+# Fitting a gaussian to the data
+def gaussian(x, sig, b, mu, c):
+    return (
+        b / (np.sqrt(2.0 * np.pi) * sig) * np.exp(-np.power((x-mu) / sig, 2.0) / 2) + c
+    )
+
+res, cov_matrix = curve_fit(
+    gaussian, 
+    deg_to_rad(angles), 
+    N_coincidences, 
+    sigma=uncertainty_coincidences,
+    p0=[1, 1, 0, 0]  # Initial guess
+)
+sigmas = np.sqrt(np.diag(cov_matrix))
+print(res, sigmas)
+
+fits = []
+for i in tqdm(range(10000)):
+    params = resample_array(res,sigmas) # Resample the fitted parameters in their uncertainties
+    fits.append(gaussian(deg_to_rad(angles_theo), *params))
+
+ax1 = plt.subplot(111)
+plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), DISTANCE_SOURCE/R_DETECTOR, 0), "--", color="red", label="théorique")
+plt.fill_between(angles_theo, np.quantile(fits, 0.0015, axis=0), np.quantile(fits, 0.9985, axis=0), color="blue", edgecolor="none", alpha=0.2)
+plt.fill_between(angles_theo, np.quantile(fits, 0.0225, axis=0), np.quantile(fits, 0.9775, axis=0), color="blue", edgecolor="none", alpha=0.4)
+plt.fill_between(angles_theo, np.quantile(fits, 0.1585, axis=0), np.quantile(fits, 0.8415, axis=0), color="blue", edgecolor="none", alpha=0.6)
+plt.errorbar(angles, N_coincidences, xerr=uncertainty_angles, yerr=uncertainty_coincidences, fmt="o", color="black", label="données")
+plt.plot(angles_theo, gaussian(deg_to_rad(angles_theo), *res), "-", color="blue", label="fit gaussien")
+plt.legend(fontsize=15)
+plt.xlabel(r"$\phi \, \mathrm{[^\circ]}$", fontsize=16)
+plt.ylabel(r"$N/N_0$", fontsize=16)
+ax1.xaxis.set_tick_params(labelsize=15)
+ax1.yaxis.set_tick_params(labelsize=15)
+plt.tight_layout()
+plt.savefig("PHY-3004/Annihilation/Figures/gaussian_fit.pdf")
 plt.show()
