@@ -30,7 +30,7 @@ def read_spec(detecteur="fixe", deg=0, res=""):
 
 data_coincidences = np.loadtxt("PHY-3004/Annihilation/Data/angles/coincidences_resolution.txt", skiprows=2, dtype=float)
 
-RESOLUTIONS = [25,50,75,100]
+RESOLUTIONS = [100,75,50,25]
 
 def A_normal_theorique(phi, ratio, offset):
     # ratio = dis_source/r_detector
@@ -52,10 +52,12 @@ for resolution in RESOLUTIONS:
     uncertainty_coincidences = np.sqrt(N_coincidences+bkg_coincidences)
     N_coincidences -= bkg_coincidences
     uncertainty_angles = np.ones_like(angles)*0.5
-    plt.errorbar(angles, N_coincidences, yerr=uncertainty_coincidences, xerr=uncertainty_angles)
+    plt.errorbar(angles, N_coincidences, yerr=uncertainty_coincidences, xerr=uncertainty_angles, label=f"resolution = {resolution}")
+plt.legend()
 plt.show()
+plt.savefig(f"PHY-3004/Annihilation/Figures/diff_resolutions.pdf")
 
-
+liste_sigma = []
 for resolution in RESOLUTIONS:
     angles = data_coincidences[:-1,0]
     N_coincidences = data_coincidences[:-1,RESOLUTIONS.index(resolution)+1]
@@ -81,13 +83,14 @@ for resolution in RESOLUTIONS:
     sigmas = np.sqrt(np.diag(cov_matrix))
     print(res, sigmas)
     angles_theo = np.linspace(-40,40,1000)
-    plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), DISTANCE_SOURCE/R_DETECTOR, 0), "--", color="red", label="théorique")
-    plt.errorbar(angles, N_coincidences, xerr=uncertainty_angles, yerr=uncertainty_coincidences, fmt="o", color="black", label="données")
-    plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), res[0], res[1]), "-", color="blue", label="fit")
-    plt.legend()
-    plt.xlabel(r"$\phi \, \mathrm{[^\circ]}$", fontsize=15)
-    plt.ylabel(r"$\%$ max", fontsize=15)
-    plt.show()
+    if False:
+        plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), DISTANCE_SOURCE/R_DETECTOR, 0), "--", color="red", label="théorique")
+        plt.errorbar(angles, N_coincidences, xerr=uncertainty_angles, yerr=uncertainty_coincidences, fmt="o", color="black", label="données")
+        plt.plot(angles_theo, A_normal_theorique(deg_to_rad(angles_theo), res[0], res[1]), "-", color="blue", label="fit")
+        plt.legend()
+        plt.xlabel(r"$\phi \, \mathrm{[^\circ]}$", fontsize=15)
+        plt.ylabel(r"$\%$ max", fontsize=15)
+        plt.show()
 
 
 
@@ -103,6 +106,7 @@ for resolution in RESOLUTIONS:
     )
     sigmas = np.sqrt(np.diag(cov_matrix))
     print(res, sigmas)
+    liste_sigma.append(res[0])
 
     fits = []
     for i in tqdm(range(10000)):
@@ -124,3 +128,12 @@ for resolution in RESOLUTIONS:
     plt.tight_layout()
     plt.savefig(f"PHY-3004/Annihilation/Figures/gaussian_fit_{resolution}.pdf")
     plt.show()
+
+ax1 = plt.subplot(111)
+plt.plot(RESOLUTIONS, rad_to_deg(liste_sigma))
+plt.xlabel(r"Résolution", fontsize=16)
+plt.ylabel(r"$\sigma$ [$^\circ$]", fontsize=16)
+ax1.xaxis.set_tick_params(labelsize=15)
+ax1.yaxis.set_tick_params(labelsize=15)
+plt.tight_layout()
+plt.show()
