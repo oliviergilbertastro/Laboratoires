@@ -111,10 +111,6 @@ def fit_gaussian(data, title="Gaussian Fit", p0=None, lower_bound=0):
     
     return pic_position, FWHM # Return only the peak position
 
-# Define bounds for isolating peaks
-Na22_511_bounds = (1080, 1380)
-Na22_1275_bounds = (2750, 3200)
-
 Co57_122_bounds = (100, 275)
 Co57_136_bounds = (275, 350)
 
