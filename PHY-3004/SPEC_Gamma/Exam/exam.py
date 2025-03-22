@@ -119,7 +119,9 @@ Co60_1333_bounds = (2932, 3371)
 
 Cs137_661_bounds = (1400, 1800)
 
-
+# Define bounds for isolating peaks
+Na22_511_bounds = (1110, 1550)
+Na22_1275_bounds = (2750, 3200)
 
 Na22_data = load_text(sources[3])
 Co57_data = load_text(sources[2])
