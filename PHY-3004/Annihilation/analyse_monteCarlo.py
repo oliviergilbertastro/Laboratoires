@@ -89,7 +89,7 @@ for resolution in RESOLUTIONS:
             deg_to_rad(resampled_angles), 
             resampled_N_coincidences,
             p0=[1,1,0,0],  # Initial guess
-            bounds=[[0,0,0,0],[np.inf, np.inf,np.inf,np.inf]]
+            bounds=[[0,0,0,-np.inf],[np.inf, np.inf,np.inf,np.inf]]
         )
         sigmas = np.sqrt(np.diag(cov_matrix))
         res_list.append(res)

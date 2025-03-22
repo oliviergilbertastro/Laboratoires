@@ -1,9 +1,0 @@
-Delta delai	N_coincidences
-(mu s)
-
-0	481
-0.04	506
-0.06	516
-0.08	244
-0.1	17
-0.2	1

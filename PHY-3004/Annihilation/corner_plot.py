@@ -22,7 +22,7 @@ def print_color(message, color="yellow", **kwargs):
 
 
 
-def myCornerPlot(data, pd_data, labels=None, if_kernel_density=False, bw_adjust=1, units=None, fontsize=15, smoothness=6, linewidth=3, extremums=None, background_colors=["#f0f0f0","#969696","#252525"], levels=4, markersize=8, save_plot=None):
+def myCornerPlot(data, labels=None, if_kernel_density=False, bw_adjust=1, units=None, fontsize=15, smoothness=6, linewidth=3, extremums=None, background_colors=["#f0f0f0","#969696","#252525"], levels=4, markersize=8, save_plot=None):
     """
     data should be [data_set1, data_set2, ...] each containing multiple parameters
     """
@@ -100,10 +100,10 @@ def myCornerPlot(data, pd_data, labels=None, if_kernel_density=False, bw_adjust=
                     values = np.vstack([data[j][i], data[j][i+k+1]])
                     kernel = st.gaussian_kde(values)
                     f = np.reshape(kernel(positions).T, xx.shape)
-                    cfset = corner_axes[i][k].contourf(xx, yy, f, cmap=["Blues","Reds","Oranges","Greens"][j % 4], levels=levels)
+                    cfset = corner_axes[i][k].contourf(xx, yy, f, cmap=["Blues","Reds","Oranges","Greens"][j % 4], levels=levels, alpha=0.7)
                     #kde = sns.kdeplot(Y, bw_adjust=bw_adjust, fill=True, levels=levels, ax=corner_axes[i][k])
                 else:
-                    corner_axes[i][k].plot(data[j][i], data[j][i+k+1], ["o","*"][j%2], color=["blue","red","orange","green"][j%4], markersize=[markersize,markersize-1][j%2])
+                    corner_axes[i][k].plot(data[j][i], data[j][i+k+1], ["o","*"][j%2], color=["blue","red","orange","green"][j%4], markersize=[markersize,markersize-1][j%2], alpha=0.3)
 
     # Make units labels and set axis limits:
     if units is None:
@@ -138,13 +138,13 @@ for resolution in RESOLUTIONS:
     datas.append(data)
 datas = np.array(datas)
 
-import pandas as pd
-fieldnames = [f"col_{i}" for i in range(datas.shape[1])]
-pandas_datas = []
-for resolution in RESOLUTIONS:
-    pandas_data = pd.read_csv(f"PHY-3004/Annihilation/params_{resolution}.txt", delimiter=" ", header=None, names=fieldnames)
-    pandas_datas.append(pandas_data)
+#import pandas as pd
+#fieldnames = [f"col_{i}" for i in range(datas.shape[1])]
+#pandas_datas = []
+#for resolution in RESOLUTIONS:
+#    pandas_data = pd.read_csv(f"PHY-3004/Annihilation/params_{resolution}.txt", delimiter=" ", header=None, names=fieldnames)
+#    pandas_datas.append(pandas_data)
 
 print(data.shape)
-myCornerPlot([datas[i].T for i in range(len(datas))], pd_data=pandas_datas, labels=[r"$\sigma$", r"Scale", r"$\mu$", r"$+C$"])
-myCornerPlot([datas[i].T for i in range(len(datas))], pd_data=pandas_datas, if_kernel_density=True, labels=[r"$\sigma$", r"Scale", r"$\mu$", r"$+C$"])
+myCornerPlot([datas[i].T for i in range(len(datas))], labels=[r"$\sigma$", r"Scale", r"$\mu$", r"$+C$"])
+myCornerPlot([datas[i].T for i in range(len(datas))], if_kernel_density=True, labels=[r"$\sigma$", r"Scale", r"$\mu$", r"$+C$"], levels=6)
