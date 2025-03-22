@@ -65,7 +65,7 @@ def fit_gaussian(data, title="Gaussian Fit", p0=None, lower_bound=0):
     params, covariance = curve_fit(gaussienne, x, data, p0=p0)
     
     A, mu, sigma, B, C = params
-    print(f"{title} - A: {A}, mu: {mu}, sigma: {sigma}, C: {C}")
+    print(f"{title} - A: {A}, mu: {mu}, sigma: {sigma}, B: {B}, C: {C}")
     
     # Calculate the FWHM
     FWHM = 2 * np.sqrt(2 * np.log(2)) * sigma
