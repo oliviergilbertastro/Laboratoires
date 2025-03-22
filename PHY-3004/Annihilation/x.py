@@ -145,7 +145,7 @@ def linear(x, a):
 
 positions = np.array([position_Co57_122,position_Cs137_661,position_Co60_1173 , position_Co60_1333])
 # Énergies en MeV correspondantes (ordre croissant)
-
+energies = np.array([0.122, 0.661, 1.173, 1.333])
 
 # Largeur à mi-hauteur (FWHM) pour chaque pic, utilisée comme incertitude (en x)
 fwhm_x = np.array([FWHM_Co57_122,FWHM_Cs137_661,FWHM_Co60_1173,FWHM_Co60_1333])
@@ -246,15 +246,15 @@ f_Cs137_pic661 = 0.851
 f_Na22_pic1275, f_Na22_pic511 = 0.994, 1.78  
 
 
-energies = np.array([122, 661, 1173, 1333])
+energies*=1000
 
 
-# Affichage des résultats avec écart en %
+# Affichage des résultats avec valeur absolue de l'écart et de l'écart en %
 for i in range(len(energies)):
     position_ajustee = positions[i] * pente
     fwhm_ajuste = fwhm_x[i] * pente
-    ecart = position_ajustee - energies[i]
-    ecart_pourcentage = (ecart / energies[i]) * 100  # Calcul de l'écart en %
+    ecart = abs(position_ajustee - energies[i])  # Valeur absolue de l'écart
+    ecart_pourcentage = abs((ecart / energies[i]) * 100)  # Valeur absolue de l'écart en %
 
-    print(f"Énergie : {energies[i]:.3f} MeV | Position ajustée : {position_ajustee:.3f} | "
-          f"FWHM ajusté : {fwhm_ajuste:.3f} | Écart : {ecart:.3f} MeV ({ecart_pourcentage:.2f}%)")
+    print(f"Énergie : {energies[i]:.3f} KeV | Position ajustée (KeV) : {position_ajustee:.3f} | "
+          f"FWHM ajusté (KeV): {fwhm_ajuste:.3f} | Écart : {ecart:.3f} KeV ({ecart_pourcentage:.2f}%)")
