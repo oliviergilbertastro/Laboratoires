@@ -54,17 +54,18 @@ Na22_data = load_text(sources[1])
 
 
 
-
-# Define the Gaussian function with a constant C
+# Définir la fonction gaussienne
 def gaussienne(x, A, mu, sigma, B, C):
-    return A * np.exp(-0.5 * ((x - mu) / sigma)**2) +B*x+ C
+    return A * np.exp(-((x - mu) ** 2) / (2 * sigma ** 2)) + B * x + C
 
 # Function to perform the Gaussian fit and calculate FWHM
-def fit_gaussian(data, title="Gaussian Fit", p0=None, lower_bound=0):
+def fit_gaussian(data, title, source_pic, p0=None, lower_bound=0):
     x = np.arange(len(data))  # Create an x-axis corresponding to the indices of the data
     params, covariance = curve_fit(gaussienne, x, data, p0=p0)
     
+    # Extraire les paramètres ajustés
     A, mu, sigma, B, C = params
+    A_err, mu_err, sigma_err, B_err, C_err = np.sqrt(np.diag(covariance))  # Calcul des incertitudes des paramètres
     print(f"{title} - A: {A}, mu: {mu}, sigma: {sigma}, B: {B}, C: {C}")
     
     # Calculate the FWHM
@@ -75,19 +76,29 @@ def fit_gaussian(data, title="Gaussian Fit", p0=None, lower_bound=0):
     pic_position = mu + lower_bound
     print(f"{title} - Peak position in original scale: {pic_position}")
     
-    # Plot the result
+    # Tracer le résultat
     plt.figure(figsize=(10, 6))
-    plt.plot(x, data, label="Data", color='blue')
-    plt.plot(x, gaussienne(x, *params), label="Gaussian Fit", color='red', linestyle='--')
-    plt.title(title)
-    plt.xlabel('Index')
-    plt.ylabel('Amplitude')
-    plt.legend()
+    plt.plot(x, data, label="Données", color='blue')
+    plt.plot(x, gaussienne(x, *params), label=f"{title}", color='red', linestyle='--')
+
+    plt.xlabel('Canaux', fontsize=18)  
+    plt.ylabel('Intensité (Counts)', fontsize=18)
+    plt.legend(fontsize=16, loc='upper right')
+    # Ajouter les incertitudes sur les paramètres avec fontsize=18
+    plt.text(0.05, 0.9, f"$A = {A:.4f} \pm {A_err:.4f}$", transform=plt.gca().transAxes, fontsize=14, color='black')
+    plt.text(0.05, 0.85, f"$\mu = {mu:.4f} \pm {mu_err:.4f}$", transform=plt.gca().transAxes, fontsize=14, color='black')
+    plt.text(0.05, 0.8, f"$\sigma = {sigma:.4f} \pm {sigma_err:.4f}$", transform=plt.gca().transAxes, fontsize=14, color='black')
+    plt.text(0.05, 0.75, f"$B = {B:.4f} \pm {B_err:.4f}$", transform=plt.gca().transAxes, fontsize=14, color='black')
+    plt.text(0.05, 0.7, f"$C = {C:.4f} \pm {C_err:.4f}$", transform=plt.gca().transAxes, fontsize=14, color='black')
+    plt.tick_params(axis='both', labelsize=18)
+    save_path="PHY-3004/Annihilation/Figures"  
+    save_file = os.path.join(save_path, f"{source_pic.replace(' ', '_')}.png")
+    plt.savefig(save_file, dpi=300)
     plt.show()
+
+
     
-    return pic_position, FWHM # Return only the peak position
-
-
+    return pic_position, FWHM # Return only the peak position cette function*
 
 Co57_122_bounds = (290, 400)
 Cs137_661_bounds = (1400, 2000)
@@ -127,12 +138,11 @@ Na22_data_1275 = Na22_data[Na22_1275_bounds[0]:Na22_1275_bounds[1]]
 
 
 
-position_Co57_122, FWHM_Co57_122 = fit_gaussian(Co57_data_122, "Gaussian Fit on Co57_data_122", p0=[max(Co57_data_122), np.argmax(Co57_data_122), 10, 0, 0], lower_bound=Co57_122_bounds[0])
-position_Cs137_661 , FWHM_Cs137_661= fit_gaussian(Cs137_data_661, "Gaussian Fit on Cs137_data_661", p0=[max(Cs137_data_661), np.argmax(Cs137_data_661), 10,0, 0], lower_bound=Cs137_661_bounds[0])
-position_Co60_1173, FWHM_Co60_1173 = fit_gaussian(Co60_data_1173, "Gaussian Fit on Co60_data_1173", p0=[max(Co60_data_1173), np.argmax(Co60_data_1173), 10,0, 0], lower_bound=Co60_1173_bounds[0])
-position_Co60_1333, FWHM_Co60_1333 = fit_gaussian(Co60_data_1333, "Gaussian Fit on Co60_data_1333", p0=[max(Co60_data_1333), np.argmax(Co60_data_1333), 10,0, 0], lower_bound=Co60_1333_bounds[0])
-position_Na22_511, FWHM_Na22_511 = fit_gaussian(Na22_data_511, "Gaussian Fit on Na22_data_511", p0=[max(Na22_data_511), np.argmax(Na22_data_511), 10,0, 0], lower_bound=Na22_511_bounds[0])
-
+position_Co57_122, FWHM_Co57_122 = fit_gaussian(Co57_data_122, "Ajustement Gaussien", 'Co57_122' ,p0=[max(Co57_data_122), np.argmax(Co57_data_122), 10, 0, 0], lower_bound=Co57_122_bounds[0])
+position_Cs137_661, FWHM_Cs137_661 = fit_gaussian(Cs137_data_661, "Ajustement Gaussien ",'Cs137_661' ,p0=[max(Cs137_data_661), np.argmax(Cs137_data_661), 10, 0, 0], lower_bound=Cs137_661_bounds[0])
+position_Co60_1173, FWHM_Co60_1173 = fit_gaussian(Co60_data_1173, "Ajustement Gaussien ",'Co60_1173', p0=[max(Co60_data_1173), np.argmax(Co60_data_1173), 10, 0, 0], lower_bound=Co60_1173_bounds[0])
+position_Co60_1333, FWHM_Co60_1333 = fit_gaussian(Co60_data_1333, "Ajustement Gaussien ", 'Co60_1333',p0=[max(Co60_data_1333), np.argmax(Co60_data_1333), 10, 0, 0], lower_bound=Co60_1333_bounds[0])
+position_Na22_511, FWHM_Na22_511 = fit_gaussian(Na22_data_511, "Ajustement Gaussien", 'Na22_511',p0=[max(Na22_data_511), np.argmax(Na22_data_511), 10, 0, 0], lower_bound=Na22_511_bounds[0])
 
 
 
@@ -247,8 +257,9 @@ f_Na22_pic1275, f_Na22_pic511 = 0.994, 1.78
 
 
 energies*=1000
-
-
+energies = np.append(energies, 511)
+positions = np.append(positions, position_Na22_511)
+fwhm_x = np.append(fwhm_x, FWHM_Na22_511)
 # Affichage des résultats avec valeur absolue de l'écart et de l'écart en %
 for i in range(len(energies)):
     position_ajustee = positions[i] * pente
