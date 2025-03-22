@@ -17,7 +17,7 @@ def load_text(source, max_channels=4096):
     return np.loadtxt(f"PHY-3004/Annihilation/Data/{source}.Spe", skiprows=12, max_rows=max_channels, dtype=float)
 
 # --- CHARGEMENT DES DONNÉES ---
-sources= ['fixe_Co60Co57Cs137', 'fixe_Na22']
+sources= ['fixe_Co60Co57Cs137', 'mobile_Na22']
 
 
 
