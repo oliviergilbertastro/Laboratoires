@@ -15,7 +15,6 @@ AREA_SPHERE_AT_DETECTOR = 4*np.pi*DISTANCE_SOURCE**2
 
 SOLID_ANGLE_DETECTOR = AREA_DETECTOR/AREA_SPHERE_AT_DETECTOR*4*np.pi
 
-print(SOLID_ANGLE_DETECTOR)
 print(f"Angle solide détecteur: {SOLID_ANGLE_DETECTOR} sr")
 
 activite_par_detector = activite_par_sr*SOLID_ANGLE_DETECTOR

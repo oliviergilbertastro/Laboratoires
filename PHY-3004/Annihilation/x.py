@@ -17,33 +17,34 @@ def load_text(source, max_channels=4096):
     return np.loadtxt(f"PHY-3004/Annihilation/Data/{source}.Spe", skiprows=12, max_rows=max_channels, dtype=float)
 
 # --- CHARGEMENT DES DONNÉES ---
-sources= ['fixe_Co60Co57Cs137', 'mobile_Na22']
+sources= ['fixe_Co60Co57Cs137', 'mobile_Na22', "fixe_Na22"]
 
 
+if False:
+    # Boucle pour générer et sauvegarder chaque spectre séparément
+    for source in sources:
+        data = load_text(source)
 
-# Boucle pour générer et sauvegarder chaque spectre séparément
-for source in sources:
-    data = load_text(source)
+        # Crée une nouvelle figure pour chaque source
+        plt.figure(figsize=(10, 6))
+        plt.plot(data, color='black')  # Courbe noire
 
-    # Crée une nouvelle figure pour chaque source
-    plt.figure(figsize=(10, 6))
-    plt.plot(data, color='black')  # Courbe noire
+        # Personnalisation du graphique
+        
+        plt.xlabel("Canal", fontsize=18)
+        plt.ylabel("Intensité(Count)", fontsize=18)
+        plt.title(f"Spectre gamma ", fontsize=18)
+        plt.legend(fontsize=18)
 
-    # Personnalisation du graphique
-    
-    plt.xlabel("Canal", fontsize=18)
-    plt.ylabel("Intensité(Count)", fontsize=18)
-    plt.title(f"Spectre gamma ", fontsize=18)
-    plt.legend(fontsize=18)
-
-    # Ajustement des tailles de caractères pour les axes
-    plt.xticks(fontsize=18)
-    plt.yticks(fontsize=18)
-    plt.show()
+        # Ajustement des tailles de caractères pour les axes
+        plt.xticks(fontsize=18)
+        plt.yticks(fontsize=18)
+        plt.show()
 
 
 data = load_text(sources[0])
 Na22_data = load_text(sources[1])
+Na22_data = load_text(sources[2])
 
 
 
@@ -96,7 +97,9 @@ def fit_gaussian(data, title, source_pic, p0=None, lower_bound=0):
     plt.savefig(save_file, dpi=300)
     plt.show()
 
-
+    from scipy.integrate import quad
+    print(x[0], x[-1],params[0],params[1],params[2], A_err, mu_err, sigma_err)
+    print("Intégrale:", quad(gaussienne, x[0], x[-1], args=(params[0],params[1],params[2],0,0)))
     
     return pic_position, FWHM # Return only the peak position cette function*
 
