@@ -20,7 +20,7 @@ def load_text(source, max_channels=4096):
 sources= ['fixe_Co60Co57Cs137', 'mobile_Na22', "fixe_Na22"]
 
 
-if False:
+if True:
     # Boucle pour générer et sauvegarder chaque spectre séparément
     for source in sources:
         data = load_text(source)
@@ -133,7 +133,7 @@ Co60_data_1333 = data[Co60_1333_bounds[0]:Co60_1333_bounds[1]]
 
 # Define bounds for isolating peaks
 Na22_511_bounds = (1110, 1550)
-Na22_1275_bounds = (2750, 3200)
+Na22_1275_bounds = (2900, 3500)
 
 # Isolate the peaks using the defined bounds
 Na22_data_511 = Na22_data[Na22_511_bounds[0]:Na22_511_bounds[1]]
@@ -146,7 +146,7 @@ position_Cs137_661, FWHM_Cs137_661 = fit_gaussian(Cs137_data_661, "Ajustement Ga
 position_Co60_1173, FWHM_Co60_1173 = fit_gaussian(Co60_data_1173, "Ajustement Gaussien ",'Co60_1173', p0=[max(Co60_data_1173), np.argmax(Co60_data_1173), 10, 0, 0], lower_bound=Co60_1173_bounds[0])
 position_Co60_1333, FWHM_Co60_1333 = fit_gaussian(Co60_data_1333, "Ajustement Gaussien ", 'Co60_1333',p0=[max(Co60_data_1333), np.argmax(Co60_data_1333), 10, 0, 0], lower_bound=Co60_1333_bounds[0])
 position_Na22_511, FWHM_Na22_511 = fit_gaussian(Na22_data_511, "Ajustement Gaussien", 'Na22_511',p0=[max(Na22_data_511), np.argmax(Na22_data_511), 10, 0, 0], lower_bound=Na22_511_bounds[0])
-
+position_Na22_1275, FWHM_Na22_1275 = fit_gaussian(Na22_data_1275, "Ajustement Gaussien", 'Na22_511',p0=[max(Na22_data_1275), np.argmax(Na22_data_1275), 10, 0, 0], lower_bound=Na22_data_1275[0])
 
 
 
