@@ -29,6 +29,7 @@ def read_spec(detecteur="fixe", deg=0, res=""):
     return np.loadtxt(f"PHY-3004/Annihilation/Data/angles/{detecteur}_Na22_{deg}{res}.txt", skiprows=15, max_rows=4096, dtype=float)
 
 data_coincidences = np.loadtxt("PHY-3004/Annihilation/Data/angles/coincidences_resolution.txt", skiprows=2, dtype=float)
+np.savetxt("PHY-3004/Annihilation/Data/uncertainties.txt", np.array(np.around(np.sqrt(data_coincidences), decimals=0), dtype=int))
 
 RESOLUTIONS = [100,75,50,25]
 

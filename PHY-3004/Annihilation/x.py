@@ -44,7 +44,7 @@ if True:
 
 data = load_text(sources[0])
 Na22_data = load_text(sources[1])
-Na22_data = load_text(sources[2])
+#Na22_data = load_text(sources[2])
 
 
 

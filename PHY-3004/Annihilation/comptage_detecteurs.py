@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 
 R_DETECTOR = 5.08/2 #cm
 DISTANCE_SOURCE = 13 # cm
+AREA_DETECTOR = R_DETECTOR**2*np.pi
+AREA_SPHERE_AT_DETECTOR = 4*np.pi*DISTANCE_SOURCE**2
+SOLID_ANGLE_DETECTOR = AREA_DETECTOR/AREA_SPHERE_AT_DETECTOR*4*np.pi
 
 #data_coincidences = np.loadtxt("PHY-3004/Annihilation/Data/angles/coincidences.txt", skiprows=2, dtype=float)
 #angles = data_coincidences[:-1,0]
@@ -42,12 +45,12 @@ def resample_array(current, current_std):
 
 efficacities = []
 areas = []
-for params in [param_pic1275_fixe, param_pic1275_mob]:
+for params in [params_fixe, params_mobile]:
     x0, x_1, A, mu, sigma, A_err, mu_Err, sigma_Err = params # Choose here wether params_fixe or params_mobile
     efficacity_list = []
     area_list = []
 
-    pic = '1275'
+    pic = '511'
 
 
     for i in tqdm(range(1000)):
@@ -81,7 +84,9 @@ print("Aire", area_final, area_final_err)
 
 efficacity_theorique = 0.34057509399566865 # from plotdigitizer
 
-
+TAUX_COMPTAGE = 2759/300 # count/s
+N_activitie = TAUX_COMPTAGE/((SOLID_ANGLE_DETECTOR/(4*np.pi))*efficacities[0][0]*efficacities[1][0])
+print(f"Activité de la source (N) = {N_activitie} \pm {N_activitie*np.sqrt((efficacities[0][1]/efficacities[0][0])**2+(efficacities[1][1]/efficacities[1][0])**2)}")
 
 
 A_1275, A_pm_1275, eff_1275, eff_pm_1275 = 3681.8177971981627, 191.725309326626, 0.10588515085434425, 0.0129668263820589
