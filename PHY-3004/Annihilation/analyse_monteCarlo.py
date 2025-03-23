@@ -43,7 +43,9 @@ def rad_to_deg(rads):
 def deg_to_rad(degs):
     return np.array(degs)*np.pi/180
 
-for resolution in RESOLUTIONS:
+COLORS = ["blue","red","orange","green"]
+ax1 = plt.subplot(111)
+for i,resolution in enumerate(RESOLUTIONS):
     angles = data_coincidences[:-1,0]
     N_coincidences = data_coincidences[:-1,RESOLUTIONS.index(resolution)+1]
     N_coincidences = np.nan_to_num(N_coincidences)
@@ -52,8 +54,22 @@ for resolution in RESOLUTIONS:
     uncertainty_coincidences = np.sqrt(N_coincidences+bkg_coincidences)
     N_coincidences -= bkg_coincidences
     uncertainty_angles = np.ones_like(angles)*0.5
-    plt.errorbar(angles, N_coincidences, yerr=uncertainty_coincidences, xerr=uncertainty_angles, label=f"resolution = {resolution}")
-plt.legend()
+
+    res, cov_matrix = curve_fit(
+        gaussian, 
+        deg_to_rad(angles), 
+        N_coincidences,
+        p0=[1,1,0,0],  # Initial guess
+        bounds=[[0,0,0,-np.inf],[np.inf, np.inf,np.inf,np.inf]]
+    )
+    angles_theo = np.linspace(-27,27,1000)
+    plt.plot(angles_theo, gaussian(deg_to_rad(angles_theo), *res), color=COLORS[i], linestyle="solid", linewidth=2, alpha=0.7)
+    plt.errorbar(angles, N_coincidences, yerr=uncertainty_coincidences, xerr=uncertainty_angles, fmt="o", label=f"résolution = {resolution}", color=COLORS[i])
+plt.legend(fontsize=15)
+plt.xlabel(r"$\phi \, \mathrm{[^\circ]}$", fontsize=16)
+plt.ylabel(r"$N_c$", fontsize=16)
+ax1.xaxis.set_tick_params(labelsize=15)
+ax1.yaxis.set_tick_params(labelsize=15)
 plt.show()
 plt.savefig(f"PHY-3004/Annihilation/Figures/diff_resolutions.pdf")
 
@@ -97,7 +113,7 @@ for resolution in RESOLUTIONS:
     angles_theo = np.linspace(-40,40,1000)
     res_list = np.array(res_list)
     np.savetxt(f"PHY-3004/Annihilation/params_{resolution}.txt", res_list)
-
+    res = np.median(res_list, axis=0)
     liste_sigma.append(np.median(res_list[:,0]))
     liste_sigma_std.append(np.std(res_list[:,0]))
     print(np.median(res_list, axis=0),np.std(res_list, axis=0))

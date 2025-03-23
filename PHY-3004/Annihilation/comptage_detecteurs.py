@@ -39,9 +39,11 @@ def resample_array(current, current_std):
     return np.asarray(new)
 
 efficacities = []
+areas = []
 for params in [params_fixe, params_mobile]:
     x0, x_1, A, mu, sigma, A_err, mu_Err, sigma_Err = params # Choose here wether params_fixe or params_mobile
     efficacity_list = []
+    area_list = []
     for i in tqdm(range(1000)):
         # Resample everything to do mcmc
         A_resampled, mu_resampled, sigma_resampled, DISTANCE_SOURCE_resampled = resample_array([A, mu, sigma, DISTANCE_SOURCE], [A_err, mu_Err, sigma_Err, 0.5])
@@ -53,14 +55,18 @@ for params in [params_fixe, params_mobile]:
         f = 1.78
         efficacity = (background_subtracted)/300*1/(G*f*Activity)
         efficacity_list.append(efficacity)
+        area_list.append(background_subtracted)
 
 
     print(np.median(efficacity_list), np.std(efficacity_list))
     efficacities.append([np.median(efficacity_list), np.std(efficacity_list)])
-
+    areas.append([np.median(area_list), np.std(area_list)])
 
 efficacity_final = (efficacities[0][0]+efficacities[1][0])/2
 efficacity_final_err = np.sqrt(efficacities[0][1]**2+efficacities[1][1]**2)
-print(efficacity_final, efficacity_final_err)
+print("Efficacité", efficacity_final, efficacity_final_err)
+area_final = (areas[0][0]+areas[1][0])/2
+area_final_err = np.sqrt(areas[0][1]**2+areas[1][1]**2)
+print("Aire", area_final, area_final_err)
 
 efficacity_theorique = 0.34057509399566865 # from plotdigitizer
