@@ -36,6 +36,15 @@ def gaussian(x, sig, b, mu, c):
     return (
         b / (np.sqrt(2.0 * np.pi) * sig) * np.exp(-np.power((x-mu) / sig, 2.0) / 2) + c
     )
+res, cov_matrix = curve_fit(
+        gaussian, 
+        delais, 
+        N_coincidences,
+        p0=[1,np.max(N_coincidences),0,0],  # Initial guess
+        bounds=[[0,0,0,0],[np.inf, np.inf,np.inf,np.inf]]
+    )
+sigmas = np.sqrt(np.diag(cov_matrix))
+print(res, sigmas)
 
 #uncertainty_coincidences /= np.max(N_coincidences)
 #N_coincidences /= np.max(N_coincidences)
