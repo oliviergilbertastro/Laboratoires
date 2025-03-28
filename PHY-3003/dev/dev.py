@@ -8,7 +8,7 @@ y = [0, 0.009375000000000001, 0.0421875, 0.1046875, 0.1640625, 0.220312500000000
 
 cs = CubicSpline(x,y)
 
-k = np.linspace(-1,1,10000)
+k_autre = np.linspace(-1,1,10000)
 k = np.linspace(-1,0.333,10000)
 E = cs(k)
 
@@ -19,40 +19,53 @@ def g(k, n=3):
 # Calcul de la dérivée dE/dk
 dE_dk = cs.derivative()(k)
 
-# Calcul de g(E) = 1/|dE/dk|
-g_E = g(k) / np.abs(dE_dk)
+# Calcul de g(E) = g(k)/|dE/dk| = g(k)*dk/dE
+g_E = g(k, n=1) / np.abs(dE_dk)
 
+from scipy.constants import hbar, m_e
+def dispersion(k):
+    return hbar**2*k**2/(2*m_e)
+
+#plt.plot(k, E, label="$E(k)$")
+plt.plot(k, dispersion(k), label="$dispersion$")
+plt.xlabel("$k$", fontsize=16)
+plt.ylabel("$E$", fontsize=16)
+plt.show()
 # Tracé de E(k)
-plt.figure(figsize=(6,4))
-plt.plot(k, E, label="$E(k)$")
-plt.xlabel("$k$")
-plt.ylabel("$E$")
-plt.legend()
-plt.show()
+fig = plt.figure(figsize=(12,4))
+ax = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
 
-# Tracé de dE/dk
-plt.figure(figsize=(6,4))
-plt.plot(k, dE_dk, label="$dE/dk$")
-plt.xlabel("$E$")
-plt.ylabel("$dE/dk$")
-plt.legend()
-plt.show()
+# First panel
+ax.plot(k_autre, cs(k_autre), label="$E(k)$")
+ax.set_xlabel("$k$", fontsize=16)
+ax.set_ylabel("$E$", fontsize=16)
+ax.legend()
+labels = ax.get_xticks().tolist()
+for i in range(len(labels)):
+    labels[i] = ""
+labels[1] = r"$-\pi/a$"
+labels[-2] = r"$\pi/a$"
+ax.set_xticklabels(labels)
+labels = ax.get_yticks().tolist()
+for i in range(len(labels)):
+    labels[i] = ""
+ax.set_yticklabels(labels)
 
-# Tracé de g(E)
-plt.figure(figsize=(6,4))
-plt.plot(E, g_E, label="$g(E) = g(k)dk/dE$")
-plt.xlabel("$E$")
-plt.ylabel("$g(E)$")
-plt.legend()
-plt.show()
-
-# Tracé de g(E)
-#frame1 = plt.gca()
-plt.figure(figsize=(6,4))
-plt.plot(E, g_E, label="$g(E) = g(k)dk/dE$")
-plt.xlabel("$E$")
-plt.ylabel("$g(E)$")
-#plt.legend()
-plt.xticks([])
-plt.yticks([])
+print(np.min(g_E))
+# Second panel
+ax2.plot(g_E, E, label="$g(E)$")
+ax2.fill_betweenx(E, 0.16635908732952864, g_E, color="blue", alpha=0.5)
+ax2.set_xlabel("$g(E)$", fontsize=16)
+ax2.set_ylabel("$E$", fontsize=16)
+ax2.legend()
+labels = ax.get_xticks().tolist()
+for i in range(len(labels)):
+    labels[i] = ""
+ax2.set_xticklabels(labels)
+labels = ax.get_yticks().tolist()
+for i in range(len(labels)):
+    labels[i] = ""
+ax2.set_yticklabels(labels)
+plt.tight_layout()
 plt.show()
