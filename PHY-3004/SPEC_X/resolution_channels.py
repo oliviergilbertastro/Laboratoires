@@ -15,6 +15,35 @@ index_min_res = resolutions.index(np.min(resolutions))
 for res in resolutions:
     data.append(loadFile(res=res))
 
+def make_same_length(array1, array2):
+    """make array1 the same length as array2, where one of the arrays is undersampled"""
+    length_ratio = int(len(array1)/len(array2)) if len(array1) > len(array2) else int(len(array2)/len(array1))
+    new_array = []
+    if len(array1) > len(array2):
+        for i in range(len(array2)):
+            for k in range(length_ratio):
+                new_array.append(array2[i])
+        return array1, new_array
+    for i in range(len(array1)):
+        for k in range(length_ratio):
+            new_array.append(array1[i])
+    return new_array, array2
+
+
+a1, a2 = np.random.random(1000), np.random.random(100)
+plt.plot(a1)
+plt.plot(a2)
+plt.show()
+a1, a2 = make_same_length(a1,a2)
+plt.plot(a1)
+plt.plot(a2)
+plt.show()
+
+
+
+import sys
+sys.exit()
+
 for n in range(len(resolutions)):
     new_data = []
     for i in range(len(data[n])):
