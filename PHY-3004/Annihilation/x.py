@@ -178,14 +178,13 @@ def linear(x, a, b):
 
 positions = np.array([position_Co57_122,position_Cs137_661,position_Co60_1173 , position_Co60_1333])
 # Énergies en MeV correspondantes (ordre croissant)
-energies = np.array([0.122, 0.661, 1.173, 1.333])
+energies = np.array([0.122, 0.661, 1.173, 1.333])*1000
 
 # Largeur à mi-hauteur (FWHM) pour chaque pic, utilisée comme incertitude (en x)
 fwhm_x = np.array([FWHM_Co57_122,FWHM_Cs137_661,FWHM_Co60_1173,FWHM_Co60_1333])
 
 # Effectuer le fit linéaire avec curve_fit
-params, covariance = curve_fit(linear, positions, energies, sigma=fwhm_x, absolute_sigma=True)
-
+params, covariance = curve_fit(linear, positions, energies, absolute_sigma=True)
 # Extraire la pente du fit
 slope = params[0]
 b = params[1]
@@ -206,10 +205,10 @@ plt.errorbar(positions, energies, xerr=fwhm_x, fmt='o', label="Pics expérimenta
 plt.plot(x, linear(x, *params), label=f"Régression linéaire", color='black', linestyle='--')
 
 # Ajouter le texte avec l'équation de la régression et la valeur de $R^2$
-equation_text = f"$y = {slope:.4f} \cdot x{b:.4f}$"
+equation_text = f"$y = ({slope:.4f}\pm{perr[0]:.4f})  \cdot x - ({np.abs(b):.4f}\pm{perr[1]:.4f})$"
 r2_text = f"$R^2 = {r_squared:.4f}$"
-plt.text(0.05, 0.6, equation_text, transform=plt.gca().transAxes, fontsize=18, color='black')
-plt.text(0.05, 0.55, r2_text, transform=plt.gca().transAxes, fontsize=18, color='black')
+plt.text(0.03, 0.6, equation_text, transform=plt.gca().transAxes, fontsize=18, color='black')
+plt.text(0.03, 0.55, r2_text, transform=plt.gca().transAxes, fontsize=18, color='black')
 
 # Personnaliser le graphique
 plt.xlabel('Position du pic (canal)', fontsize=18)
@@ -220,11 +219,11 @@ plt.grid(True)
 
 # Ajuster la taille des graduations (ticks)
 plt.tick_params(axis='both', labelsize=18)
-plt.tight_layout
+plt.tight_layout()
 save_path="PHY-3004/Annihilation/Figures/Fit_lin"  
 
 plt.savefig(save_path, dpi=300)
-plt.show(block=False)
+plt.show(block=True)
 
     # Pause for 5 seconds
 plt.pause(1)
@@ -236,6 +235,78 @@ plt.close('all')
 print(f"Pente de la régression linéaire (a) : {slope:.4f}")
 print(f"Erreur standard du coefficient de pente : {perr[0]:.4f}")
 print(f"$R^2$ : {r_squared:.4f}")
+
+
+
+# Monte carlo fit linéaire
+
+from random import gauss
+
+def resample_array(current, current_std):
+    new = []
+    for s in range(0, len(current)):
+        if current_std[s] > 0:
+            new.append(gauss(current[s], current_std[s]))
+        else:
+            new.append(current[s])
+    return np.asarray(new)
+
+mc_iter = 10000
+param_list = []
+error_list = []
+
+for i in range(mc_iter):
+    resampled_positions = resample_array(positions, fwhm_x)
+    ps, covs = curve_fit(linear, resampled_positions, energies)
+    param_list.append(ps)
+    error_list.append(np.sqrt(np.diag(covs)))
+
+param_list = np.array(param_list)
+error_list = np.array(error_list)
+
+parameters = np.median(param_list, axis=0)
+errors = np.std(param_list, axis=0)
+
+print("**********************************************")
+print(parameters)
+print(errors)
+
+fits = []
+for i in range(mc_iter):
+    pars = resample_array(parameters, errors)
+    fits.append(linear(x, *pars))
+
+ax1 = plt.subplot(111)
+plt.fill_between(x, np.quantile(fits, 0.0015, axis=0), np.quantile(fits, 0.9985, axis=0), color="blue", edgecolor="none", alpha=0.2)
+plt.fill_between(x, np.quantile(fits, 0.0225, axis=0), np.quantile(fits, 0.9775, axis=0), color="blue", edgecolor="none", alpha=0.4)
+plt.fill_between(x, np.quantile(fits, 0.1585, axis=0), np.quantile(fits, 0.8415, axis=0), color="blue", edgecolor="none", alpha=0.6)
+plt.errorbar(positions, energies, xerr=fwhm_x, fmt='o', label="Pics expérimentaux", color='black', capsize=5)
+plt.plot(x, linear(x, *params), label=f"Régression linéaire", color='black', linestyle='--')
+plt.xlabel('Position du pic (canal)', fontsize=18)
+plt.ylabel('Énergie (KeV)', fontsize=18)
+equation_text = f"$y = ({slope:.2f}\pm{errors[0]:.2f})  \cdot x - ({np.abs(b):.2f}\pm{errors[1]:.2f})$"
+r2_text = f"$R^2 = {r_squared:.4f}$"
+plt.text(0.03, 0.85, equation_text, transform=plt.gca().transAxes, fontsize=18, color='black')
+plt.text(0.03, 0.75, r2_text, transform=plt.gca().transAxes, fontsize=18, color='black')
+plt.legend(fontsize=18, loc="lower right")
+ax1.xaxis.set_tick_params(labelsize=15)
+ax1.yaxis.set_tick_params(labelsize=15)
+plt.tight_layout()
+plt.savefig("PHY-3004/Annihilation/Figures/Fit_lin_MonteCarlo.pdf")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

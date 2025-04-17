@@ -3,6 +3,7 @@ Needed to make a lot of tables in the terminal and there is no support for it, s
 There are now various useful general functions in here, and some functions made specifically for the QPE vs TDE paper
 """
 
+import PIL.Image
 import numpy as np
 from math import floor, ceil
 import matplotlib.pyplot as plt
@@ -283,14 +284,29 @@ def add_0_uncertainties(a, value=0):
         placeholder[:,0] = a
         a = placeholder
         return a
+    
+from matplotlib.image import imread
+import PIL
+def remove_white(img_path, level=0.1):
+    img_name, img_type = img_path.split(".")
+    img = np.array(imread(img_path))
+    img_max = np.max(img[:,:,0])
+    shape = img.shape
+    new_img = np.empty((shape[0],shape[1],4))
+    transparency_mask = np.empty((shape[0], shape[1]))
+    for y in range(shape[0]):
+        for x in range(shape[1]):
+            if np.mean(img[y,x,:3]) >= img_max-(level*img_max):
+                transparency_mask[y,x] = 0
+            else:
+                transparency_mask[y,x] = 1
+    new_img[:,:,:3] = img
+    new_img[:,:,3] = transparency_mask
 
+    new_img = PIL.Image.fromarray((new_img*255).astype(np.uint8))
+    new_img.save(f"{img_name}-modified.{img_type}")
 
 import time
 if __name__ == "__main__":
-
-    start_time = time.time()
-    print(get_smallest_sep([2.36286871e+02, -5.18003056e-01], [2.36247096e+02,2.36286871e+02,2.36336501e+02,2.15640297e+02], [-4.75263889e-01,-5.18003056e-01,-4.89098889e-01,1.06889111e+00]))
-    print("\x1b[33m: --- %s seconds ---\x1b[0m" % (time.time() - start_time))
-    start_time = time.time()
-    print(get_smallest_sep_v2([2.36286871e+02, -5.18003056e-01], [2.36247096e+02,2.36286871e+02,2.36336501e+02,2.15640297e+02], [-4.75263889e-01,-5.18003056e-01,-4.89098889e-01,1.06889111e+00]))
-    print("\x1b[33m: --- %s seconds ---\x1b[0m" % (time.time() - start_time))
+    remove_white(r"C:\Users\lauri\Downloads\vecPrim.png", level=0.3)
+    
