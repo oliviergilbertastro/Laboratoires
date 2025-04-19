@@ -289,11 +289,11 @@ from matplotlib.image import imread
 import PIL
 def remove_white(img_path, level=0.1):
     img_name, img_type = img_path.split(".")
-    img = np.array(imread(img_path))
+    img = np.array(imread(img_path))[:,:,:3]
     img_max = np.max(img[:,:,0])
     shape = img.shape
     new_img = np.empty((shape[0],shape[1],4))
-    transparency_mask = np.empty((shape[0], shape[1]))
+    transparency_mask = img[:,:,3]
     for y in range(shape[0]):
         for x in range(shape[1]):
             if np.mean(img[y,x,:3]) >= img_max-(level*img_max):
@@ -308,5 +308,5 @@ def remove_white(img_path, level=0.1):
 
 import time
 if __name__ == "__main__":
-    remove_white(r"C:\Users\lauri\Downloads\vecPrim.png", level=0.3)
+    remove_white(r"c:\Users\olivi\Downloads\optical_lattice.png", level=0.1)
     
